@@ -64,6 +64,7 @@ import com.example.mamduhtaskmanager.ui.component.DefaultTopBar
 import com.example.mamduhtaskmanager.ui.component.FloatingCircle
 import com.example.mamduhtaskmanager.ui.component.FloatingCirclesBG
 import com.example.mamduhtaskmanager.ui.component.textFieldColorGenerator
+import com.example.mamduhtaskmanager.ui.component.todoCircles
 import com.example.mamduhtaskmanager.ui.component.trackVelocity
 import com.example.mamduhtaskmanager.ui.navigation.TaskDestination
 import com.example.mamduhtaskmanager.ui.theme.primaryColor
@@ -287,41 +288,18 @@ fun SubTaskItem(
 
 @Composable
 fun TaskScreenFloatingCircles(modifier: Modifier = Modifier) {
-    val brush = Brush.linearGradient(
-        listOf(
-            primaryColor,
-            secondaryColor
-        )
+
+    FloatingCirclesBG(modifier, todoCircles)
+}
+
+@Preview
+@Composable
+private fun TodoScreeenPreview() {
+    TodoContent(
+        uiState = TodoScreenUiState(),
+        addSubTasks = {  },
+        onDoneClick = {  },
+        onTextChange = { newString, id -> }
     )
-
-    val circles = listOf(
-        FloatingCircle(
-            brush,
-            300f,
-            100f,
-            200f,
-            20f,
-            0
-        ),
-        FloatingCircle(
-            brush,
-            500f,
-            600f,
-            1500f,
-            -150f,
-            200
-        ),
-        FloatingCircle(
-            brush,
-            500f,
-            1200f,
-            200f,
-            20f,
-            500
-        ),
-    )
-    FloatingCirclesBG(modifier,circles)
-
-
 }
 
