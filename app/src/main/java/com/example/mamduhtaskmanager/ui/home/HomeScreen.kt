@@ -65,6 +65,7 @@ import com.example.mamduhtaskmanager.ui.component.HomeFAB
 import com.example.mamduhtaskmanager.ui.component.MyDrawer
 import com.example.mamduhtaskmanager.ui.component.PickActivityDialog
 import com.example.mamduhtaskmanager.ui.component.SubTaskListItem
+import com.example.mamduhtaskmanager.ui.component.homeCircles
 import com.example.mamduhtaskmanager.ui.theme.primaryColor
 import com.example.mamduhtaskmanager.ui.theme.secondaryColor
 import com.example.mamduhtaskmanager.ui.theme.slitedBoxShape
@@ -165,40 +166,7 @@ fun HomeScreenContent(
     showDetail: (List<SubTask>) -> Unit,
     ) {
     Box(modifier = modifier){
-        val brush = Brush.linearGradient(
-            listOf(
-                primaryColor,
-                secondaryColor
-            )
-        )
-        val circles = listOf(
-            FloatingCircle(
-                brush,
-                500f,
-                0f,
-                0f,
-                10f,
-                0
-            ),
-            FloatingCircle(
-                brush,
-                700f,
-                1000f,
-                1000f,
-                -150f,
-                200
-            ),
-            FloatingCircle(
-                brush,
-                400f,
-                2500f,
-                500f,
-                100f,
-                200
-            ),
-        )
-        FloatingCirclesBG(modifier,circles)
-
+        FloatingCirclesBG(modifier,homeCircles)
         Column (
             modifier
                 .fillMaxSize()
