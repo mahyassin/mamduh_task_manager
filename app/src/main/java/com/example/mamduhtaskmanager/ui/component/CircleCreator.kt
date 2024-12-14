@@ -114,3 +114,93 @@ private fun HomeBackGroundPreview() {
     )
     FloatingCirclesBG(modifier = Modifier,circles)
 }
+
+
+val brush = Brush.linearGradient(
+    listOf(
+        primaryColor,
+        secondaryColor
+    )
+)
+
+val homeCircles = listOf(
+    FloatingCircle(
+        brush,
+        500f,
+        0f,
+        0f,
+        10f,
+        0
+    ),
+    FloatingCircle(
+        brush,
+        700f,
+        1000f,
+        1000f,
+        -150f,
+        200
+    ),
+    FloatingCircle(
+        brush,
+        400f,
+        2500f,
+        500f,
+        100f,
+        200
+    ),
+)
+
+val todoCircles = listOf(
+    FloatingCircle(
+        brush,
+        300f,
+        100f,
+        200f,
+        20f,
+        0
+    ),
+    FloatingCircle(
+        brush,
+        500f,
+        600f,
+        1500f,
+        -150f,
+        200
+    ),
+    FloatingCircle(
+        brush,
+        500f,
+        1200f,
+        200f,
+        20f,
+        500
+    ),
+)
+
+
+val habitCircles = listOf(
+    FloatingCircle(
+        brush,
+        300f,
+        100f,
+        200f,
+        20f,
+        0
+    ),
+    FloatingCircle(
+        brush,
+        500f,
+        600f,
+        1500f,
+        -150f,
+        200
+    ),
+    FloatingCircle(
+        brush,
+        500f,
+        1200f,
+        200f,
+        20f,
+        500
+    ),
+)
