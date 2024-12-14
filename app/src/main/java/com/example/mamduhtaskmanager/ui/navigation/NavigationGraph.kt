@@ -6,7 +6,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.mamduhtaskmanager.ui.home.HomeScreen
-import com.example.mamduhtaskmanager.ui.todo.TodoContent
 import com.example.mamduhtaskmanager.ui.todo.TodoScreen
 
 
@@ -15,16 +14,21 @@ fun HomeScreenContainer(modifier: Modifier = Modifier) {
     val navHostController = rememberNavController()
     NavHost(
         navController = navHostController,
-        startDestination = HomeDestination.route,
+        startDestination = HomeDestination,
     ) {
 
-        composable(route = HomeDestination.route) {
-            HomeScreen() {navHostController.navigate(TaskDestination.route)}
+//        composable(route = HomeDestination.route) {
+//            HomeScreen() {navHostController.navigate(TaskDestination.route)}
+//        }
+        composable<HomeDestination>{
+            HomeScreen(
+                goToDoScreen = { navHostController.navigate(TaskDestination) }
+            )
         }
 
-        composable(route = TaskDestination.route) {
+        composable<TaskDestination> {
             TodoScreen(
-                gotoHome = { navHostController.navigate(route = HomeDestination.route) }
+                gotoHome = { navHostController.navigate(HomeDestination) }
             )
         }
     }
