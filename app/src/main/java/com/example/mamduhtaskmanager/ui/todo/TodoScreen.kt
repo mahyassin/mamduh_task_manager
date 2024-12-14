@@ -60,6 +60,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mamduhtaskmanager.ViewModelProvider
 import com.example.mamduhtaskmanager.data.SubTask
+import com.example.mamduhtaskmanager.ui.component.DefaultTextField
 import com.example.mamduhtaskmanager.ui.component.DefaultTopBar
 import com.example.mamduhtaskmanager.ui.component.FloatingCircle
 import com.example.mamduhtaskmanager.ui.component.FloatingCirclesBG
@@ -189,24 +190,12 @@ fun TaskAdder(
                     }
                 }
             }
-            TextField(
+            DefaultTextField(
                 value = "",
-                onValueChange = {
-
-                },
-                colors = TextFieldDefaults.colors().copy(
-                    unfocusedLabelColor = surfacePrimary,
-                    focusedLabelColor = primaryColor,
-                    focusedTextColor =surfaceSecondary,
-                    unfocusedSupportingTextColor =surfacePrimary,
-                    unfocusedTextColor = surfaceSecondary,
-                    unfocusedContainerColor = Color(0x00ffffff),
-                    focusedContainerColor = Color(0x00ffffff),
-                    focusedIndicatorColor = Color(0x00ffffff),
-                    unfocusedIndicatorColor = Color(0x00ffffff)
-                ),
-                label = {Text("Task title  'optional' ")},
-                modifier = modifier.border(2.dp, brush,RectangleShape)
+                onValueChange = {},
+                shape = RectangleShape,
+                label = "Task title  'optional' ",
+                borderColor = brush
             )
             SubTasksList(
                task = task,
