@@ -20,6 +20,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.mamduhtaskmanager.ui.theme.primaryColor
 import com.example.mamduhtaskmanager.ui.theme.secondaryColor
+import com.example.mamduhtaskmanager.ui.theme.surfacePrimary
+import com.example.mamduhtaskmanager.ui.theme.surfaceSecondary
 import kotlinx.coroutines.delay
 
 
@@ -115,8 +117,13 @@ private fun HomeBackGroundPreview() {
     FloatingCirclesBG(modifier = Modifier,circles)
 }
 
-
-val brush = Brush.linearGradient(
+val secoundrayBrush = Brush.linearGradient(
+    listOf(
+        surfacePrimary,
+        surfaceSecondary
+    )
+)
+val primaryBrush = Brush.linearGradient(
     listOf(
         primaryColor,
         secondaryColor
@@ -125,7 +132,7 @@ val brush = Brush.linearGradient(
 
 val homeCircles = listOf(
     FloatingCircle(
-        brush,
+        primaryBrush,
         500f,
         0f,
         0f,
@@ -133,7 +140,7 @@ val homeCircles = listOf(
         0
     ),
     FloatingCircle(
-        brush,
+        primaryBrush,
         700f,
         1000f,
         1000f,
@@ -141,7 +148,7 @@ val homeCircles = listOf(
         200
     ),
     FloatingCircle(
-        brush,
+        primaryBrush,
         400f,
         2500f,
         500f,
@@ -152,7 +159,7 @@ val homeCircles = listOf(
 
 val todoCircles = listOf(
     FloatingCircle(
-        brush,
+        primaryBrush,
         300f,
         100f,
         200f,
@@ -160,7 +167,7 @@ val todoCircles = listOf(
         0
     ),
     FloatingCircle(
-        brush,
+        primaryBrush,
         500f,
         600f,
         1500f,
@@ -168,7 +175,7 @@ val todoCircles = listOf(
         200
     ),
     FloatingCircle(
-        brush,
+        primaryBrush,
         500f,
         1200f,
         200f,
@@ -180,7 +187,7 @@ val todoCircles = listOf(
 
 val habitCircles = listOf(
     FloatingCircle(
-        brush,
+        primaryBrush,
         300f,
         100f,
         200f,
@@ -188,7 +195,7 @@ val habitCircles = listOf(
         0
     ),
     FloatingCircle(
-        brush,
+        primaryBrush,
         500f,
         600f,
         1500f,
@@ -196,7 +203,7 @@ val habitCircles = listOf(
         200
     ),
     FloatingCircle(
-        brush,
+        primaryBrush,
         500f,
         1200f,
         200f,
