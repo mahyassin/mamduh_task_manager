@@ -117,16 +117,17 @@ private fun HomeBackGroundPreview() {
     FloatingCirclesBG(modifier = Modifier,circles)
 }
 
-val secoundrayBrush = Brush.linearGradient(
-    listOf(
-        surfacePrimary,
-        surfaceSecondary
-    )
-)
+
 val primaryBrush = Brush.linearGradient(
     listOf(
         primaryColor,
         secondaryColor
+    )
+)
+val secoundryBrush = Brush.linearGradient(
+    listOf(
+        surfacePrimary,
+        surfaceSecondary
     )
 )
 
@@ -210,4 +211,5 @@ val habitCircles = listOf(
         20f,
         500
     ),
+
 )

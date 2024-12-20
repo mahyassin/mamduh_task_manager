@@ -19,13 +19,9 @@ class TodoScreenViewModel(private val taskRepository: TaskRepository) : ViewMode
     private var subTaskId = 0
 
 
-    fun showSubtasks() {
-        _uiState.update { it.copy(showSubtasks = true) }
-    }
-
     fun addSubtask() {
         val subTask = SubTask(
-            subTaskId =subTaskId,
+            subTaskId = subTaskId,
             done = false,
             content = "",
             taskId = TempValHolder.taskId,

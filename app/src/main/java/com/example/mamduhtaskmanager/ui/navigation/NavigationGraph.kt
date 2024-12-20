@@ -5,6 +5,9 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import com.example.mamduhtaskmanager.ui.happitTractor.HabitTractorCreator
+import com.example.mamduhtaskmanager.ui.home.ActivityDetail
 import com.example.mamduhtaskmanager.ui.home.HomeScreen
 import com.example.mamduhtaskmanager.ui.todo.TodoScreen
 
@@ -12,24 +15,41 @@ import com.example.mamduhtaskmanager.ui.todo.TodoScreen
 @Composable
 fun HomeScreenContainer(modifier: Modifier = Modifier) {
     val navHostController = rememberNavController()
-    NavHost(
-        navController = navHostController,
-        startDestination = HomeDestination,
-    ) {
 
-//        composable(route = HomeDestination.route) {
-//            HomeScreen() {navHostController.navigate(TaskDestination.route)}
-//        }
-        composable<HomeDestination>{
+    NavHost(
+        navHostController, startDestination = Home
+    ){
+        composable<Home>{
             HomeScreen(
-                goToDoScreen = { navHostController.navigate(TaskDestination) }
+                goToActivity = {
+                    navHostController.navigate(ActivityDetailsRoute(it))
+                },
+
+                goToDoScreen = {
+                    navHostController.navigate(TaskDestination)
+                },
+
+                goToHabit = {
+                    navHostController.navigate(Habit)
+                },
             )
         }
-
-        composable<TaskDestination> {
-            TodoScreen(
-                gotoHome = { navHostController.navigate(HomeDestination) }
+        composable<ActivityDetailsRoute> {
+            val argument = it.toRoute<ActivityDetailsRoute>()
+            ActivityDetail(
+                taskId = argument.taskId,
+                gotoHome = {
+                    navHostController.navigate(Home)
+                }
             )
+        }
+        composable<TaskDestination> {
+            TodoScreen { navHostController.navigate(Home) }
+        }
+
+        composable<Habit> {
+            HabitTractorCreator()
         }
     }
+
 }

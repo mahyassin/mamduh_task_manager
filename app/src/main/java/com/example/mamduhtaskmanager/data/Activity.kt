@@ -8,12 +8,13 @@ import kotlin.time.ExperimentalTime
 data class SubTask(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val subTaskId: Int ,
-    val done: Boolean = false,
+    val subTaskId: Int,
+    var done: Boolean = false,
     var content: String = "",
 
     val taskId: Int = 0,
     val taskTitle: String = "",
+    val taskComplete: Boolean = false,
 
     )
 

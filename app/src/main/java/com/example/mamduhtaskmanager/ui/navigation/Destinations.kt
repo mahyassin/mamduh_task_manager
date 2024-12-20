@@ -1,9 +1,9 @@
 package com.example.mamduhtaskmanager.ui.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.serialization.Serializable
 
@@ -13,23 +13,30 @@ interface Destinations {
 }
 
 @Serializable
-object HomeDestination: Destinations {
+object Habit
+
+@Serializable
+object Home: Destinations {
+
     override val title: String
-        get() = "Home Screen"
+        get() = "HomeScreen"
     override val icon: ImageVector
         get() = Icons.Default.Menu
 }
-
-
 @Serializable
-
-object TaskDestination: Destinations {
+object TaskDestination: Destinations{
 
     override val title: String
-        get() = "Task screen"
+        get() = "Tas Manger"
     override val icon: ImageVector
-        get() = Icons.Default.Check
+        get() = Icons.Default.MoreVert
+
 }
+@Serializable
+data class ActivityDetailsRoute(
+    val taskId: Int
+)
+
 @Serializable
 object HabitTractorDestination: Destinations {
     override val title: String

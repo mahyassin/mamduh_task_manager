@@ -84,7 +84,7 @@ fun TodoScreen(
         topBar = {
             DefaultTopBar(
                 onIconClick = {},
-                title = TaskDestination.title,
+                title = "Tasks",
                 icon = Icons.Default.ArrowBack,
                 haveLeadingIcon = true
             )
@@ -93,13 +93,16 @@ fun TodoScreen(
         TodoContent(
             Modifier.padding(it),
             uiState,
+
             addSubTasks = { viewModel.addSubtask() },
             onDoneClick = {
                 viewModel.insertTask()
                 gotoHome()
+            },
+            onTextChange =  { newString,id ->
+                viewModel.onFieldTextValueChange(newString,id)
             }
-        ) { newString,id ->
-            viewModel.onFieldTextValueChange(newString,id)}
+        )
     }
 }
 
@@ -268,7 +271,7 @@ fun SubTaskItem(
                 value = subTask.content,
                 onValueChange = { onTextChange(it,subTask.subTaskId) },
                 modifier = modifier.padding(horizontal = 24.dp),
-                label = { Text("task ${subTask.id + 1}") },
+                label = { Text("task ${subTask.subTaskId + 1}") },
                 colors = textFieldColorGenerator(0)
             )
         }

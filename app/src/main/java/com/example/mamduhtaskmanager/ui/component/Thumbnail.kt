@@ -11,6 +11,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,11 +21,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -39,6 +46,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.mamduhtaskmanager.data.SubTask
@@ -46,23 +55,17 @@ import com.example.mamduhtaskmanager.data.experimentalTask
 import com.example.mamduhtaskmanager.ui.theme.primaryColor
 import com.example.mamduhtaskmanager.ui.theme.surfacePrimary
 import com.example.mamduhtaskmanager.ui.theme.surfaceSecondary
-import com.example.mamduhtaskmanager.ui.theme.secondaryColor
 
 
 @Composable
 fun TaskThumbnailCard(
     modifier: Modifier = Modifier,
-    completeTask: () -> Unit,
-    title: String = "" ,
+    title: String = "",
     task: List<SubTask>,
     showDetails: () -> Unit,
+    deleteTask: () -> Unit,
 ) {
-    val brush = Brush.linearGradient(
-        listOf(
-            surfacePrimary,
-            secondaryColor
-        )
-    )
+
 
     val infiniteTransition = rememberInfiniteTransition(label = "hovering cards infinate")
     val targetFloat by remember { mutableStateOf((-15..15).random().toFloat()) }
@@ -76,7 +79,7 @@ fun TaskThumbnailCard(
     )
     Column(
         modifier
-            .padding(4.dp)
+            .padding(16.dp)
             .graphicsLayer { translationY = offesty.value }
             .clickable {
                 showDetails()
@@ -84,54 +87,59 @@ fun TaskThumbnailCard(
         horizontalAlignment = Alignment.CenterHorizontally,
         ) {
 
-        Surface(
-            modifier = modifier
-                .padding(4.dp),
-            shadowElevation = 10.dp,
-            shape = CircleShape
+        Row {
+            Surface(
+                modifier = modifier
+                    .padding(vertical = 4.dp),
+                shadowElevation = 10.dp,
+                shape = CircleShape
             ) {
-            Text(
-                if (title.isEmpty()) {
-                    "Task list ${task[0].taskId + 1}"
-                } else {
-                    title
-                },
-                color = surfaceSecondary,
-                style = MaterialTheme.typography.titleMedium,
-                modifier = modifier.padding(4.dp)
+                Box {
+                    FinishedSubtask(
+                        textContent = if(task.first().taskTitle.isEmpty())
+                                "Task${task.first().taskTitle} ${task.first().taskId}"
+                        else
+                            task.first().taskTitle,
 
-            )
+                        isComplete = task.first().taskComplete,
+                    )
+
+                }
+            }
+            TextButton(
+                onClick = { deleteTask() }
+
+            ){
+                Icon(
+                    Icons.Default.Clear,
+                    contentDescription = null,
+                    tint = surfaceSecondary
+                )
+            }
         }
         Spacer(Modifier.height(4.dp))
         Surface(
             modifier
-//                .border(
-//                    2.dp,
-//                    brush,
-//                    shape = slitedBoxShape
-//                )
-
-                .padding(4.dp),
+                .padding(12.dp),
             shadowElevation = 10.dp,
             shape = RoundedCornerShape(10.dp)
 
         ) {
-            Column(modifier.width(160.dp)) {
+            Column(
+                modifier
+                    .width(160.dp)
+                    .padding(12.dp)) {
                 task.forEach {
-                    if (it.done) {
+                    if (it.subTaskId  < 2) {
                         FinishedSubtask(
-                            task = it
-                        )
-                    } else {
-                        OnGoingTask(
-
-                            completeTask = {  },
-                            task = it
+                            textContent = it.content,
+                            isComplete = it.done
                         )
                     }
                 }
             }
         }
+        DoneCounter(task = task)
     }
 }
 
@@ -157,37 +165,83 @@ fun OnGoingTask(
     }
 }
 
+
+@Composable
+fun DoneCounter(modifier: Modifier = Modifier,task: List<SubTask>) {
+    var doneTasks = 0
+    task.forEach {
+        if (it.done)
+            doneTasks++
+    }
+    Row(
+        modifier.width(120.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Surface(
+            shape = CircleShape,
+            shadowElevation = 10.dp
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically){
+                Text(
+                    "$doneTasks",
+                    modifier.padding(4.dp)
+                )
+
+                Icon(
+                    Icons.Default.Check,
+                    contentDescription = null,
+                    modifier.padding(4.dp),
+                    tint = surfacePrimary
+                )
+                Text(
+                    "out of ${task.size}",
+                    modifier.padding(4.dp)
+                )
+            }
+        }
+
+    }
+}
+
 @Composable
 fun FinishedSubtask(
     modifier: Modifier = Modifier,
-    task: SubTask,
+    textContent: String,
+    isComplete: Boolean,
+    fontSize: TextStyle = LocalTextStyle.current,
+    textAlign: TextAlign? = null
 ) {
 
 
     val brush = Brush.linearGradient(
         listOf(Color.Black)
     )
-    var textLength = 0f
+    val initialLength = -10f
+    var targetLength by remember { mutableStateOf(-10f) }
+    val textSlashing by animateFloatAsState(targetLength)
     var textHieght = 0f
 
     Box {
         Text(
-            task.content,
-            color = Color.LightGray,
+            textContent,
+            color = if (isComplete) Color.LightGray else surfaceSecondary,
             maxLines = 1,
             modifier = modifier
                 .padding(6.dp)
                 .onGloballyPositioned {
-                    textLength = it.size.width.toFloat()
+                    targetLength = it.size.width.toFloat()
                     textHieght = it.size.height.toFloat()
                 },
+            style = fontSize,
+            textAlign = textAlign
 
             )
-        Canvas(modifier) {
+        Canvas(Modifier.padding(6.dp)) {
             drawLine(
                 brush = brush,
-                start = Offset(-100f, 40f),
-                end = Offset(textLength, 40f),
+                start = Offset(initialLength, textHieght/2),
+                end = Offset(if (isComplete)textSlashing else initialLength, textHieght/2),
                 strokeWidth = 2f
             )
         }
@@ -208,19 +262,18 @@ fun SubTaskListItem(
             Color.Black
         )
     )
-    var done by remember { mutableStateOf(false) }
-
     var textLength by  remember { mutableStateOf(0f) }
+    var textHieght by remember { mutableStateOf(0f)}
     val strokeAnimatoin by animateFloatAsState(
-        if(done) textLength else -100f,
+        if(task.done) textLength else -100f,
         animationSpec = tween(300, easing = EaseOut)
     )
 
     val surfaceSecoundryToGray by animateColorAsState(
-        if (done) Color.LightGray else surfaceSecondary
+        if (task.done) Color.LightGray else surfaceSecondary
     )
     val primaryToGray by animateColorAsState(
-        if (done) Color.LightGray else primaryColor
+        if (task.done) Color.LightGray else primaryColor
     )
 
     Surface(
@@ -231,9 +284,10 @@ fun SubTaskListItem(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Checkbox(
-                done,
-                onCheckedChange = { completeTask(task.subTaskId)
-                                  done = it },
+                task.done,
+                onCheckedChange = {
+                    completeTask(task.subTaskId)
+                },
                 colors = CheckboxDefaults.colors().copy(
                     checkedBorderColor = primaryToGray,
                     uncheckedBorderColor = primaryToGray,
@@ -243,20 +297,21 @@ fun SubTaskListItem(
             )
             Box {
                 Text(
-                    task.content,
+                    "${task.content} ${task.done} ",
                     color = surfaceSecoundryToGray,
                     maxLines = 1,
                     modifier = modifier
                         .padding(end = 8.dp)
                         .onGloballyPositioned {
                             textLength = it.size.width.toFloat()
+                            textHieght = it.size.height.toFloat()
                         }
                 )
                 Canvas(modifier) {
                     drawLine(
                         brush = brush,
-                        start = Offset(-100f, 35f),
-                        end = Offset(strokeAnimatoin, 35f),
+                        start = Offset(-100f, textHieght/2),
+                        end = Offset(strokeAnimatoin, textHieght/2),
                         strokeWidth = 2f
                     )
                 }
@@ -279,7 +334,7 @@ private fun SubtaskListItemPreview() {
         )
 
 
-    SubTaskListItem(completeTask = {}, task =task)
+//    SubTaskListItem(completeTask = {}, task =task)
 }
 
 
@@ -332,10 +387,11 @@ fun textFieldColorGenerator(type: Int): TextFieldColors {
 @Composable
 private fun AcitivityCardPreview() {
     TaskThumbnailCard(
-        completeTask = {},
         title = "",
         task = experimentalTask,
-        showDetails = {  }
+        showDetails = { },
+        modifier = Modifier,
+        deleteTask = {  }
     )
 }
 
@@ -344,10 +400,18 @@ private fun AcitivityCardPreview() {
 private fun ThumbnalsPreview() {
 
     TaskThumbnailCard(
-        completeTask = {},
         title = "",
         task = experimentalTask,
-        showDetails = {}
+        showDetails = {},
+        modifier = Modifier,
+        deleteTask = {  }
     )
+}
+
+@Preview
+@Composable
+private fun DoneCounterPreview() {
+    DoneCounter(task = experimentalTask)
+    
 }
 
