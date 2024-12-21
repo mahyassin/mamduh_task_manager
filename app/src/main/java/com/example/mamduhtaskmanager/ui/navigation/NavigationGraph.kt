@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.example.mamduhtaskmanager.ui.happitTractor.HabitContainer
 import com.example.mamduhtaskmanager.ui.happitTractor.HabitTractorCreator
 import com.example.mamduhtaskmanager.ui.home.ActivityDetail
 import com.example.mamduhtaskmanager.ui.home.HomeScreen
@@ -39,16 +40,18 @@ fun HomeScreenContainer(modifier: Modifier = Modifier) {
             ActivityDetail(
                 taskId = argument.taskId,
                 gotoHome = {
-                    navHostController.navigate(Home)
+                    navHostController.popBackStack(Home,false)
                 }
             )
         }
         composable<TaskDestination> {
-            TodoScreen { navHostController.navigate(Home) }
+            TodoScreen { navHostController.popBackStack(Home,false) }
         }
 
         composable<Habit> {
-            HabitTractorCreator()
+            HabitContainer() {
+                navHostController.popBackStack(Home,false)
+            }
         }
     }
 

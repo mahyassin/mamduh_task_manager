@@ -66,6 +66,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.6")
     implementation("androidx.compose.runtime:runtime:1.7.4")
 
+    
+
 
     dependencies {
         implementation(libs.androidx.animation)

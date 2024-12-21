@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -108,15 +109,19 @@ fun HomeScreen(
             AnimatedVisibility(
                 showAlert,
                 enter = slideInVertically() { it },
-                exit = slideOutHorizontally() { it }
+                exit = slideOutVertically() { it }
             ) {
                 PickActivityDialog(
                     onDemandRequest = { viewModel.addingActivity() },
                     goToDoScreen = {
                         goToDoScreen()
                         viewModel.getTaskId()
+                        viewModel.addingActivity()
                     },
-                    goTooHabit = { goToHabit() }
+                    goTooHabit = {
+                        goToHabit()
+                        viewModel.addingActivity()
+                    }
                 )
             }
 

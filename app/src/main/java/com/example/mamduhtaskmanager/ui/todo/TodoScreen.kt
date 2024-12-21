@@ -83,7 +83,9 @@ fun TodoScreen(
     Scaffold(
         topBar = {
             DefaultTopBar(
-                onIconClick = {},
+                onIconClick = {
+                    gotoHome()
+                },
                 title = "Tasks",
                 icon = Icons.Default.ArrowBack,
                 haveLeadingIcon = true
