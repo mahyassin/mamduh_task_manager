@@ -1,25 +1,30 @@
 package com.example.mamduhtaskmanager.ui.happitTractor
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.foundation.background
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.setValue
@@ -31,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -43,8 +49,12 @@ import com.example.mamduhtaskmanager.ui.component.GoalTabRow
 import com.example.mamduhtaskmanager.ui.component.habitCircles
 import com.example.mamduhtaskmanager.ui.component.secoundryBrush
 import com.example.mamduhtaskmanager.ui.navigation.HabitTractorDestination
+import com.example.mamduhtaskmanager.ui.theme.primaryColor
+import com.example.mamduhtaskmanager.ui.theme.surfacePrimary
 import com.example.mamduhtaskmanager.ui.theme.surfaceSecondary
-import kotlin.math.abs
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 enum class Goal {
     Task,
@@ -55,6 +65,7 @@ enum class Goal {
 fun HabitTractorCreator(
     modifier: Modifier = Modifier,
     viewModel: HabitViewModel = viewModel(factory = ViewModelProvider.Factory),
+
 ) {
     val clock by viewModel.clock.collectAsState()
 
@@ -63,7 +74,11 @@ fun HabitTractorCreator(
         FloatingCirclesBG(modifier = Modifier,habitCircles)
         HabitTractorContent(
             clock = clock, times = clock.times,
-            counterChange = { viewModel.counterChange(it) }
+            counterChange = { viewModel.counterChange(it) },
+            startignDate = clock.startingDate,
+            endingDate = clock.endingDate,
+            startingDateIspicked = { viewModel.pickStartingDate(it) },
+            endingDateIspicked = {viewModel.pickEndingDate(it)},
         ) {
             h,m,s ->
             viewModel.clockChange(h,m,s)
@@ -75,6 +90,7 @@ fun HabitTractorCreator(
 fun HabitContainer(
     modifier: Modifier = Modifier,
     clock: Clock = Clock(0,0,0),
+    goHome: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -82,102 +98,305 @@ fun HabitContainer(
                 icon = HabitTractorDestination.icon,
                 title = HabitTractorDestination.title,
                 haveLeadingIcon = true,
-                onIconClick = {}
+                onIconClick = { goHome() }
             )
         }
     ) {
         Box {
-            HabitTractorCreator(modifier.padding(it),)
+            LookaheadScope {
+                HabitTractorCreator(modifier.padding(it),)
+            }
 
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HabitTractorContent(
     modifier: Modifier = Modifier, clock: Clock,
     times: String,
     counterChange: (String) -> Unit,
+    startignDate: Long,
+    endingDate: Long,
+    startingDateIspicked: (Long) -> Unit,
+    endingDateIspicked: (Long) -> Unit,
     clockChange: (Int, Int, Int) -> Unit,
 
     ) {
-    Column (modifier){
-        Surface(
-            shadowElevation = 10.dp,
-            shape = CircleShape,
-            modifier = Modifier.padding(16.dp)
-        ) {
-            val brush = Brush.linearGradient(
-                listOf(
-                    Color(0x00ffffff),
-                    Color(0x00ffffff),
+    Box {
+        var showDayPicker by remember { mutableStateOf(false) }
+        var isStartingDate by remember { mutableStateOf(true) }
+
+        Column(modifier) {
+            // habit name inputfield
+            //region
+            Surface(
+                shadowElevation = 10.dp,
+                shape = CircleShape,
+                modifier = Modifier.padding(16.dp)
+            ) {
+                val brush = Brush.linearGradient(
+                    listOf(
+                        Color(0x00ffffff),
+                        Color(0x00ffffff),
+
+                        )
+                )
+                DefaultTextField(
+                    value = "",
+                    onValueChange = { },
+                    shape = CircleShape,
+                    label = "Habit Name",
+                    borderColor = brush,
 
                     )
-            )
-            DefaultTextField(
-                value = "",
-                onValueChange = {  },
-                shape = CircleShape,
-                label = "Habit Name",
-                borderColor = brush,
 
-            )
+            }
+            //endregion
+            var selectedTab by rememberSaveable { mutableStateOf(Goal.Task) }
 
-        }
-        var selectedTab by rememberSaveable { mutableStateOf(Goal.Task) }
+            // the goal tabRow
+            // region
+            GoalTabRow(
+                selected = selectedTab,
+                selecteMe = { selectedTab = it }
+            ) //endregion
 
-        GoalTabRow(
-            selected = selectedTab,
-            selecteMe = { selectedTab = it }
-        )
-
-        //animate the content in when the tab is pressed
-        AnimatedVisibility(selectedTab == Goal.Time) {
-
+            // the Task TabRow
+            //region
             var animateTimer by remember { mutableStateOf(false) }
-            Column (
-                Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                TimeTabContent(
-                    clock = clock,
-                    content = times.toString(),
+            //animate the content in when the time tab is pressed
+            AnimatedVisibility(selectedTab == Goal.Time) {
+
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    animateTimer = !animateTimer
-                }
-                AnimatedVisibility(
-                    animateTimer,
-                    enter = slideInHorizontally(),
-                    exit = slideOutHorizontally() { -abs(it + it/3) }
-                ) {
-                    Column {
-                        TimePicker(
-                            hours = clock.hour,
-                            minutes = clock.minute,
-                            secounds = clock.secound,
-                        ) { h, m, s -> clockChange(h, m, s) }
+                    TimeTabContent(
+                        clock = clock,
+                        content = times.toString(),
+                    ) {
+                        animateTimer = !animateTimer
+                    }
+
+                    AnimatedVisibility(
+                        animateTimer,
+                    ) {
+                        Column(
+                            modifier.padding(24.dp),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            TimePicker(
+                                hours = clock.hour,
+                                minutes = clock.minute,
+                                secounds = clock.secound,
+                            ) { h, m, s -> clockChange(h, m, s) }
+                        }
                     }
                 }
+
             }
+
+
+            //animate the content when the count tab is pressed
+            AnimatedVisibility(selectedTab == Goal.Count) {
+                Column(
+                    modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    var showTimePicker by remember { mutableStateOf(false) }
+                    CountTabContent(times = times) { counterChange(it) }
+
+                }
+
+            }
+            //endregion
+
+
+        /* #######################################################################################
+        @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+        @@@@@@@@@@@@@@@@@@@@@@@@                                            @@@@@@@@@@@@@@@@@@@@@@@@
+        @@@@@@@@@@@@@@@@@@@@@@@@            Schedule section                @@@@@@@@@@@@@@@@@@@@@@@@
+        @@@@@@@@@@@@@@@@@@@@@@@@                                            @@@@@@@@@@@@@@@@@@@@@@@@
+        @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ */
+
+            //the start Date and endDate surfaces
+            //region
+            Column {
+                ScheduleSection(
+                    modifier,
+                    startignDate,
+                    showDayPicker = {
+                        showDayPicker = !showDayPicker
+                        isStartingDate = it
+                    },
+                    endingDate,
+                )
+            }
+            //endregion
+
 
         }
 
-        AnimatedVisibility(selectedTab == Goal.Count) {
+        /* the date picker need to ba at full screen hierarchy so it wont be affected by other
+        * elements layout  */
+        //datePicker
+
+        //region
+
+        val datePickerState  = rememberDatePickerState()
+        AnimatedVisibility(
+            showDayPicker,
+            enter = slideInVertically(){it/2},
+            exit = slideOutVertically() {it}
+        ) {
             Column(
-                modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                var showTimePicker by remember { mutableStateOf(false) }
-               CountTabContent(times = times) { counterChange(it)}
+                modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Bottom
+                ) {
+                Surface(
+                    shape = RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp),
+                    shadowElevation = 10.dp
+                ) {
+                    Column {
+                        DatePicker(datePickerState)
+                        TextButton(
+                            onClick = {
+                                if (isStartingDate)
+                                startingDateIspicked(datePickerState.selectedDateMillis?:0)
+                                else endingDateIspicked(datePickerState.selectedDateMillis?:0)
+                                showDayPicker = false
+                            }
+                            ,
+                            modifier
+                                .align(Alignment.End)
+                                .padding(12.dp)
+                        ) {
+                            Text(
+                                "Done",
+                                style = MaterialTheme.typography.titleMedium)
+                        }
+                    }
+
+                }
 
             }
 
+        }
+        //endregion
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ScheduleSection(
+    modifier: Modifier = Modifier,
+    startignDate: Long,
+    showDayPicker: (Boolean) -> Unit,
+    endingDate: Long,
+) {
+
+    //region
+    Column(
+        modifier.padding(12.dp)
+    ) {
+        Text(
+            "Schedule :",
+            style = MaterialTheme.typography.titleLarge,
+            color = surfacePrimary,
+            modifier = modifier.padding(bottom = 12.dp)
+        )
+        Row {
+            Surface(
+                shape = CircleShape,
+                shadowElevation = 10.dp,
+                modifier = Modifier.padding(12.dp)
+            ) {
+                val dateFormat = SimpleDateFormat("dd MMM ", Locale.getDefault())
+                val formatedStartingDate = dateFormat.format(Date(startignDate))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(8.dp)
+                ) {
+                    Column(modifier.padding(8.dp)) {
+                        Text(
+                            "starting Date",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = primaryColor
+                        )
+                        Text(
+                            text = formatedStartingDate,
+                            style = MaterialTheme.typography.titleLarge,
+                            color = surfaceSecondary
+                        )
+                    }
+                    Icon(
+                        Icons.Default.Edit,
+                        contentDescription = null,
+                        modifier
+                            .padding(horizontal = 12.dp)
+                            .clickable {
+                                showDayPicker(true)
+                            }
+                    )
+                }
+
+            }
+            Surface(
+                shape = CircleShape,
+                shadowElevation = 10.dp,
+                modifier = Modifier.padding(12.dp)
+            ) {
+                val dateFormat = SimpleDateFormat("dd MMM " , Locale.getDefault())
+                val formatedStartingDate = dateFormat.format(Date(endingDate))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(8.dp)
+                ) {
+                    Column(modifier.padding(8.dp)) {
+                        Text(
+                            "ending Date",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = primaryColor
+                        )
+                        Text(
+                            text = formatedStartingDate,
+                            style = MaterialTheme.typography.titleLarge,
+                            color = surfaceSecondary
+                        )
+                    }
+                    Icon(
+                        Icons.Default.Edit,
+                        contentDescription = null,
+                        modifier
+                            .padding(horizontal = 12.dp)
+                            .clickable {
+                                showDayPicker(false)
+                            }
+                    )
+                }
+            }
         }
     }
+
+    //endregion
+
+}
+
+@Preview (showBackground = true)
+@Composable
+private fun ScheduleSectionPreview() {
+    ScheduleSection(
+        startignDate = 0,
+        showDayPicker = { },
+        endingDate = 0,
+    )
 }
 
 @Composable
@@ -345,6 +564,7 @@ private fun GoalTabBarPreview() {
 @Composable
 private fun HabitContainerPreview() {
     HabitContainer(
-        clock = Clock(0,0,0)
+        clock = Clock(0, 0, 0),
+        goHome = {  }
     )
 }

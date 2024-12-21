@@ -30,6 +30,12 @@ class HabitViewModel(private val taskRepository: TaskRepository): ViewModel() {
             _colock.update { it.copy(times = "") }
         }
     }
+    fun pickStartingDate(newDate: Long) {
+        _colock.update { it.copy(startingDate = newDate) }
+    }
+    fun pickEndingDate(newDate: Long) {
+        _colock.update { it.copy(endingDate = newDate) }
+    }
 }
 
 data class Clock(
@@ -37,4 +43,6 @@ data class Clock(
     val minute: Int,
     val secound: Int,
     val times: String = "",
+    val startingDate: Long = 1734998400000,
+    val endingDate: Long = 1734998400000,
 )

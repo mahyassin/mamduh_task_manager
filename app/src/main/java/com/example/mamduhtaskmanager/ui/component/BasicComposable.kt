@@ -122,7 +122,7 @@ fun GoalTabRow(
     val infiniteTransition = rememberInfiniteTransition("hovering Animation")
     val hoveringoffset by infiniteTransition.animateFloat(
         0f,
-        20f,
+        10f,
         animationSpec = infiniteRepeatable(
             repeatMode = RepeatMode.Reverse,
             animation = keyframes { durationMillis = 2000 }
