@@ -15,6 +15,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -35,6 +36,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -65,12 +67,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mamduhtaskmanager.ui.happitTractor.Goal
 import com.example.mamduhtaskmanager.ui.theme.primaryColor
+import com.example.mamduhtaskmanager.ui.theme.secondaryColor
 import com.example.mamduhtaskmanager.ui.theme.surfacePrimary
 import com.example.mamduhtaskmanager.ui.theme.surfaceSecondary
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
+val DaysOfTheWeek = listOf<Pair<String, Boolean>>(
+    Pair("Sat",false),
+    Pair( "Sun",false),
+    Pair( "Mon",false),
+    Pair( "Tue",false),
+    Pair( "Wen",false),
+    Pair("Thu",false),
+    Pair( "Fri",false),
+)
 
 @Composable
 fun DefaultTextField(
@@ -229,6 +241,57 @@ fun SelectedTab(
 }
 
 @Composable
+fun DaysOfTheWeekSelector(
+    modifier: Modifier = Modifier,
+    daysOfTheWeek: List<Pair<String, Boolean>>,
+    onWeekClick:(Pair<String, Boolean>) -> Unit,
+
+) {
+    Row(Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly) {
+        daysOfTheWeek.forEach {
+            WeekSquare(
+                week = it,
+                onWeekClick = { onWeekClick(it) }
+            )
+        }
+    }
+
+
+
+}
+
+
+@Composable
+fun WeekSquare(
+    modifier: Modifier = Modifier.padding(4.dp),
+    week: Pair<String, Boolean>,
+    onWeekClick:(Pair<String, Boolean>) -> Unit
+) {
+
+    Surface (
+        shape = RoundedCornerShape(10),
+        shadowElevation = 10.dp,
+        modifier = modifier
+            .graphicsLayer {
+                scaleX = if (week.second) 0.85f else 1f
+                scaleY = if (week.second) 0.85f else 1f
+                translationY = if (week.second) 10f else 0f
+            }
+            .clickable {
+                onWeekClick(week)
+            },
+        color = if (week.second) surfaceSecondary else secondaryColor,
+    ){
+        Text(
+            week.first,
+            modifier = modifier,
+            color = Color.White
+        )
+    }
+}
+
+@Composable
 fun DefaultTimePicker(modifier: Modifier = Modifier) {
     
 }
@@ -291,6 +354,27 @@ fun CustomTimePicker(
     }
 
    
+}
+
+@Preview (widthDp = 380)
+@Composable
+private fun DaysOfTheWeekSelectorPreview() {
+    //viewModel Logic
+    // region
+    var daysOfTheWeek by remember { mutableStateOf(DaysOfTheWeek) }
+    fun onWeekClick(week: Pair<String, Boolean>) {
+        val updatedDaysOfTheWeek = daysOfTheWeek.map {
+            if (week.first == it.first) it.copy(second = !it.second)
+            else it
+        }
+        daysOfTheWeek = updatedDaysOfTheWeek
+    }
+    //endregion
+    DaysOfTheWeekSelector(
+        onWeekClick = {onWeekClick(it)},
+        daysOfTheWeek = daysOfTheWeek
+    )
+
 }
 @Preview
 @Composable

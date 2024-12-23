@@ -58,6 +58,7 @@ import androidx.compose.ui.unit.dp
 import com.example.mamduhtaskmanager.R
 import com.example.mamduhtaskmanager.ui.theme.primaryColor
 import com.example.mamduhtaskmanager.ui.theme.secondaryColor
+import com.example.mamduhtaskmanager.ui.theme.surfaceSecondary
 
 
 @Composable
@@ -180,7 +181,8 @@ fun MyDrawer(modifier: Modifier = Modifier) {
 @Composable
 fun DrawerTitle(modifier: Modifier = Modifier.padding(16.dp)) {
     val gradient = Brush.linearGradient(
-        listOf(primaryColor,
+        listOf(
+            primaryColor,
             secondaryColor)
     )
     Surface(
@@ -236,7 +238,7 @@ fun DefaultTopBar(
     val infiniteTransition = rememberInfiniteTransition("backGround Transitoin")
     val bgColor =infiniteTransition.animateColor(
         surfacePrimary,
-        Color(0xFFE816FF),
+        surfaceSecondary,
         animationSpec = InfiniteRepeatableSpec(
             repeatMode = RepeatMode.Reverse,
             animation = keyframes {
@@ -271,12 +273,12 @@ fun DefaultTopBar(
                             .clickable {
                                 onIconClick()
                             },
-                        tint = Color(0xffffffff)
+                        tint = Color.White
                     )
                 }
                 Text(
                     title, style = MaterialTheme.typography.headlineMedium,
-                    color = Color(0xffffffff),
+                    color = Color.White,
                     modifier = modifier.padding(12.dp)
                 )
 

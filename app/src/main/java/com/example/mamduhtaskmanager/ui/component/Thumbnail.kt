@@ -297,7 +297,7 @@ fun SubTaskListItem(
             )
             Box {
                 Text(
-                    "${task.content} ${task.done} ",
+                    "${task.content} ",
                     color = surfaceSecoundryToGray,
                     maxLines = 1,
                     modifier = modifier

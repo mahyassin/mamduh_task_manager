@@ -1,5 +1,6 @@
 package com.example.mamduhtaskmanager.ui.happitTractor
 
+import android.view.Surface
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -16,8 +17,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -37,11 +41,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.LookaheadScope
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mamduhtaskmanager.ViewModelProvider
 import com.example.mamduhtaskmanager.ui.component.CustomTimePicker
+import com.example.mamduhtaskmanager.ui.component.DaysOfTheWeekSelector
 import com.example.mamduhtaskmanager.ui.component.DefaultTextField
 import com.example.mamduhtaskmanager.ui.component.DefaultTopBar
 import com.example.mamduhtaskmanager.ui.component.FloatingCirclesBG
@@ -49,7 +55,10 @@ import com.example.mamduhtaskmanager.ui.component.GoalTabRow
 import com.example.mamduhtaskmanager.ui.component.habitCircles
 import com.example.mamduhtaskmanager.ui.component.secoundryBrush
 import com.example.mamduhtaskmanager.ui.navigation.HabitTractorDestination
+import com.example.mamduhtaskmanager.ui.theme.IsItDark
+import com.example.mamduhtaskmanager.ui.theme.MamduhTaskManagerTheme
 import com.example.mamduhtaskmanager.ui.theme.primaryColor
+import com.example.mamduhtaskmanager.ui.theme.secondaryColor
 import com.example.mamduhtaskmanager.ui.theme.surfacePrimary
 import com.example.mamduhtaskmanager.ui.theme.surfaceSecondary
 import java.text.SimpleDateFormat
@@ -61,30 +70,7 @@ enum class Goal {
     Time,
     Count
 }
-@Composable
-fun HabitTractorCreator(
-    modifier: Modifier = Modifier,
-    viewModel: HabitViewModel = viewModel(factory = ViewModelProvider.Factory),
 
-) {
-    val clock by viewModel.clock.collectAsState()
-
-
-    Box(modifier) {
-        FloatingCirclesBG(modifier = Modifier,habitCircles)
-        HabitTractorContent(
-            clock = clock, times = clock.times,
-            counterChange = { viewModel.counterChange(it) },
-            startignDate = clock.startingDate,
-            endingDate = clock.endingDate,
-            startingDateIspicked = { viewModel.pickStartingDate(it) },
-            endingDateIspicked = {viewModel.pickEndingDate(it)},
-        ) {
-            h,m,s ->
-            viewModel.clockChange(h,m,s)
-        }
-    }
-}
 
 @Composable
 fun HabitContainer(
@@ -111,6 +97,35 @@ fun HabitContainer(
     }
 }
 
+
+@Composable
+fun HabitTractorCreator(
+    modifier: Modifier = Modifier,
+    viewModel: HabitViewModel = viewModel(factory = ViewModelProvider.Factory),
+
+) {
+    val clock by viewModel.clock.collectAsState()
+
+
+    Box(modifier) {
+        FloatingCirclesBG(modifier = Modifier,habitCircles)
+        HabitTractorContent(
+            clock = clock, times = clock.times,
+            counterChange = { viewModel.counterChange(it) },
+            startignDate = clock.startingDate,
+            endingDate = clock.endingDate,
+            startingDateIspicked = { viewModel.pickStartingDate(it) },
+            endingDateIspicked = { viewModel.pickEndingDate(it) },
+            onDayClick = { viewModel.onWeekClick(it) },
+            daysOfTheWeek = clock.daysOfTheWeek,
+            doneHabitCreation = {  }, //todo create a habbit thumbnail and a habit screen
+        ) {
+            h,m,s ->
+            viewModel.clockChange(h,m,s)
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HabitTractorContent(
@@ -121,6 +136,9 @@ fun HabitTractorContent(
     endingDate: Long,
     startingDateIspicked: (Long) -> Unit,
     endingDateIspicked: (Long) -> Unit,
+    onDayClick:(Pair<String, Boolean>) -> Unit,
+    daysOfTheWeek: List<Pair<String, Boolean>>,
+    doneHabitCreation: ()-> Unit,
     clockChange: (Int, Int, Int) -> Unit,
 
     ) {
@@ -154,6 +172,7 @@ fun HabitTractorContent(
 
             }
             //endregion
+
             var selectedTab by rememberSaveable { mutableStateOf(Goal.Task) }
 
             // the goal tabRow
@@ -162,6 +181,7 @@ fun HabitTractorContent(
                 selected = selectedTab,
                 selecteMe = { selectedTab = it }
             ) //endregion
+
 
             // the Task TabRow
             //region
@@ -241,11 +261,19 @@ fun HabitTractorContent(
             }
             //endregion
 
+            // days of the week section
+            DaysOfTheWeekSelector(
+                modifier.align(Alignment.CenterHorizontally),
+                daysOfTheWeek = daysOfTheWeek
+            ) {
+                onDayClick(it)
+            }
 
         }
 
         /* the date picker need to ba at full screen hierarchy so it wont be affected by other
-        * elements layout  */
+        * elements layout
+        * */
         //datePicker
 
         //region
@@ -290,8 +318,35 @@ fun HabitTractorContent(
 
         }
         //endregion
+
+        HabitDoneSurface(
+            doneHabitCreation = doneHabitCreation,
+            modifier.align(Alignment.BottomCenter)
+
+        )
+
     }
 }
+
+@Composable
+fun HabitDoneSurface(
+    doneHabitCreation: ()-> Unit,
+    modifier: Modifier,
+) {
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shadowElevation = 10.dp,
+        shape = RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp),
+
+    ) {
+        Button(onClick = { doneHabitCreation() }) {
+            Text(
+                "Done"
+            )
+        }
+    }
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -302,7 +357,6 @@ fun ScheduleSection(
     endingDate: Long,
 ) {
 
-    //region
     Column(
         modifier.padding(12.dp)
     ) {
@@ -384,9 +438,6 @@ fun ScheduleSection(
             }
         }
     }
-
-    //endregion
-
 }
 
 @Preview (showBackground = true)
@@ -560,11 +611,17 @@ private fun GoalTabBarPreview() {
     GoalTabBar()
 }
 
-@Preview
+@Preview (showBackground = true)
 @Composable
 private fun HabitContainerPreview() {
-    HabitContainer(
-        clock = Clock(0, 0, 0),
-        goHome = {  }
-    )
+    MamduhTaskManagerTheme(
+        darkTheme = false
+    ) {
+        IsItDark()
+        HabitContainer(
+            clock = Clock(0, 0, 0),
+            goHome = {  }
+        )
+    }
+
 }

@@ -183,7 +183,11 @@ fun PortriatAlertMassage(
 
 
     Row {
-        ActivityItem(Modifier, brush) {
+        ActivityItem(
+            Modifier
+                .clickable { goTooHabit() },
+            brush
+        ) {
             Icon(
                 Icons.Default.Face,
                 contentDescription = null,
@@ -224,8 +228,6 @@ fun ActivityItem(modifier: Modifier = Modifier,brush: Brush, SurfaceIcon:@Compos
             ),
         "hovering impl"
     )
-
-
 
 
     Surface(

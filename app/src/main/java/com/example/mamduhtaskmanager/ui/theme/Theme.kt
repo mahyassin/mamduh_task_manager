@@ -12,10 +12,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
+
+
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80,
+    primary = primaryColor,
+    secondary = secondaryColor,
+    tertiary = surfacePrimary,
     surface = surfaceSecondary,
     onSurface = Color.White,
 
@@ -51,9 +53,10 @@ fun MamduhTaskManagerTheme(
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        darkTheme -> DarkColorScheme
+        darkTheme -> LightColorScheme
         else -> LightColorScheme
     }
+
 
     MaterialTheme(
         colorScheme = colorScheme,
