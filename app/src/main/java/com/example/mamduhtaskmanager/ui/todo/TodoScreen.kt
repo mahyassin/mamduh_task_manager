@@ -101,9 +101,10 @@ fun TodoScreen(
                 viewModel.insertTask()
                 gotoHome()
             },
-            onTextChange =  { newString,id ->
-                viewModel.onFieldTextValueChange(newString,id)
-            }
+            onTextChange = { newString, id ->
+                viewModel.onFieldTextValueChange(newString, id)
+            },
+            onTitleTextChange = { viewModel.onTitleTextChange(it) }
         )
     }
 }
@@ -114,11 +115,11 @@ fun TodoContent(
     uiState: TodoScreenUiState,
     addSubTasks: () -> Unit,
     onDoneClick: ()-> Unit,
+    onTitleTextChange: (String) -> Unit,
     onTextChange: (String, Int) -> Unit
 ) {
 
     Box(modifier) {
-
         TaskScreenFloatingCircles()
         Row(horizontalArrangement = Arrangement.Center) {
             TaskAdder(
@@ -127,7 +128,9 @@ fun TodoContent(
                 onTextChange = { newString, id ->
                     onTextChange(newString, id)
                 },
-                onDoneClick = { onDoneClick() } ,
+                onDoneClick = { onDoneClick() },
+                onTitleTextChange = { onTitleTextChange(it) },
+                taskTitle = uiState.taskTitle,
             )
         }
 
@@ -139,8 +142,10 @@ fun TodoContent(
 fun TaskAdder(
     modifier: Modifier = Modifier,
     task: List<SubTask>,
+    taskTitle: String,
     addSubTasks: ()-> Unit,
     onDoneClick: ()-> Unit,
+    onTitleTextChange: (String) -> Unit,
     onTextChange: (String, Int) -> Unit,
     ) {
     val brush = Brush.linearGradient(
@@ -196,8 +201,8 @@ fun TaskAdder(
                 }
             }
             DefaultTextField(
-                value = "",
-                onValueChange = {},
+                value = taskTitle,
+                onValueChange = { onTitleTextChange(it) },
                 shape = RectangleShape,
                 label = "Task title  'optional' ",
                 borderColor = brush
@@ -291,9 +296,10 @@ fun TaskScreenFloatingCircles(modifier: Modifier = Modifier) {
 private fun TodoScreeenPreview() {
     TodoContent(
         uiState = TodoScreenUiState(),
-        addSubTasks = {  },
-        onDoneClick = {  },
-        onTextChange = { newString, id -> }
+        addSubTasks = { },
+        onDoneClick = { },
+        onTextChange = { newString, id -> },
+        onTitleTextChange = {}
     )
 }
 

@@ -1,5 +1,6 @@
 package com.example.mamduhtaskmanager.ui.todo
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -35,6 +36,10 @@ class TodoScreenViewModel(private val taskRepository: TaskRepository) : ViewMode
     }
 
     fun insertTask() {
+        val updatedTask = _uiState.value.task.map {
+            it.copy(taskTitle = _uiState.value.taskTitle )
+        }
+        _uiState.update { it.copy(task = updatedTask) }
         viewModelScope.launch {
             _uiState.value.task.forEach {
                 taskRepository.insertSubtask(it)
@@ -53,10 +58,17 @@ class TodoScreenViewModel(private val taskRepository: TaskRepository) : ViewMode
         // Update the UI state with the new list
         _uiState.update { it.copy(task = updatedTask) }
     }
+
+    fun onTitleTextChange(newTitle: String) {
+        // this for they ui change
+        _uiState.update { it.copy(taskTitle = newTitle) }
+
+    }
 }
 
 
 data class TodoScreenUiState(
     val showSubtasks: Boolean = false,
     val task: List<SubTask> = emptyList(),
+    val taskTitle: String = "",
 )
