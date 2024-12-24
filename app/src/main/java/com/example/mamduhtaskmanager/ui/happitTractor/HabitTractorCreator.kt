@@ -1,6 +1,5 @@
 package com.example.mamduhtaskmanager.ui.happitTractor
 
-import android.view.Surface
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -9,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -19,9 +19,7 @@ import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -41,7 +39,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.LookaheadScope
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -58,7 +55,6 @@ import com.example.mamduhtaskmanager.ui.navigation.HabitTractorDestination
 import com.example.mamduhtaskmanager.ui.theme.IsItDark
 import com.example.mamduhtaskmanager.ui.theme.MamduhTaskManagerTheme
 import com.example.mamduhtaskmanager.ui.theme.primaryColor
-import com.example.mamduhtaskmanager.ui.theme.secondaryColor
 import com.example.mamduhtaskmanager.ui.theme.surfacePrimary
 import com.example.mamduhtaskmanager.ui.theme.surfaceSecondary
 import java.text.SimpleDateFormat
@@ -112,7 +108,7 @@ fun HabitTractorCreator(
         HabitTractorContent(
             clock = clock, times = clock.times,
             counterChange = { viewModel.counterChange(it) },
-            startignDate = clock.startingDate,
+            startigDate = clock.startingDate,
             endingDate = clock.endingDate,
             startingDateIspicked = { viewModel.pickStartingDate(it) },
             endingDateIspicked = { viewModel.pickEndingDate(it) },
@@ -132,7 +128,7 @@ fun HabitTractorContent(
     modifier: Modifier = Modifier, clock: Clock,
     times: String,
     counterChange: (String) -> Unit,
-    startignDate: Long,
+    startigDate: Long,
     endingDate: Long,
     startingDateIspicked: (Long) -> Unit,
     endingDateIspicked: (Long) -> Unit,
@@ -251,7 +247,7 @@ fun HabitTractorContent(
             Column {
                 ScheduleSection(
                     modifier,
-                    startignDate,
+                    startigDate,
                     showDayPicker = {
                         showDayPicker = !showDayPicker
                         isStartingDate = it
@@ -279,51 +275,62 @@ fun HabitTractorContent(
         //region
 
         val datePickerState  = rememberDatePickerState()
-        AnimatedVisibility(
-            showDayPicker,
-            enter = slideInVertically(){it/2},
-            exit = slideOutVertically() {it}
-        ) {
-            Column(
-                modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Bottom
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxHeight(),
+            verticalArrangement = Arrangement.Bottom
+            ) {
+            AnimatedVisibility(
+                showDayPicker,
+                enter = slideInVertically() { it / 2 },
+                exit = slideOutVertically() { it }
+            ) {
+                Column(
+                    modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Bottom
                 ) {
-                Surface(
-                    shape = RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp),
-                    shadowElevation = 10.dp
-                ) {
-                    Column {
-                        DatePicker(datePickerState)
-                        TextButton(
-                            onClick = {
-                                if (isStartingDate)
-                                startingDateIspicked(datePickerState.selectedDateMillis?:0)
-                                else endingDateIspicked(datePickerState.selectedDateMillis?:0)
-                                showDayPicker = false
+                    Surface(
+                        shape = RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp),
+                        shadowElevation = 10.dp
+                    ) {
+                        Column {
+                            DatePicker(datePickerState)
+                            TextButton(
+                                onClick = {
+                                    if (isStartingDate)
+                                        startingDateIspicked(
+                                            datePickerState.selectedDateMillis ?: 0
+                                        )
+                                    else endingDateIspicked(datePickerState.selectedDateMillis ?: 0)
+                                    showDayPicker = false
+                                },
+                                modifier
+                                    .align(Alignment.End)
+                                    .padding(12.dp)
+                            ) {
+                                Text(
+                                    "Done",
+                                    style = MaterialTheme.typography.titleMedium
+                                )
                             }
-                            ,
-                            modifier
-                                .align(Alignment.End)
-                                .padding(12.dp)
-                        ) {
-                            Text(
-                                "Done",
-                                style = MaterialTheme.typography.titleMedium)
                         }
+
                     }
 
                 }
 
             }
+            HabitDoneSurface(
+                doneHabitCreation = doneHabitCreation,
+                modifier,
 
+
+            )
         }
         //endregion
 
-        HabitDoneSurface(
-            doneHabitCreation = doneHabitCreation,
-            modifier.align(Alignment.BottomCenter)
 
-        )
+
 
     }
 }
@@ -339,9 +346,11 @@ fun HabitDoneSurface(
         shape = RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp),
 
     ) {
-        Button(onClick = { doneHabitCreation() }) {
+        TextButton(onClick = { doneHabitCreation() }) {
             Text(
-                "Done"
+                "Done",
+                color = surfaceSecondary,
+                modifier = Modifier.padding(24.dp)
             )
         }
     }
