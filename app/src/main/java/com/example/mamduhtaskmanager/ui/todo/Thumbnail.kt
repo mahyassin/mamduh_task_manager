@@ -1,4 +1,4 @@
-package com.example.mamduhtaskmanager.ui.component
+package com.example.mamduhtaskmanager.ui.todo
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.EaseOut
@@ -15,9 +15,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,7 +27,6 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -87,24 +85,21 @@ fun TaskThumbnailCard(
         horizontalAlignment = Alignment.CenterHorizontally,
         ) {
 
-        Row {
+        Row( verticalAlignment = Alignment.CenterVertically ) {
             Surface(
                 modifier = modifier
                     .padding(vertical = 4.dp),
                 shadowElevation = 10.dp,
                 shape = CircleShape
             ) {
-                Box {
-                    FinishedSubtask(
-                        textContent = if(task.first().taskTitle.isEmpty())
-                                "Task${task.first().taskTitle} ${task.first().taskId}"
-                        else
-                            task.first().taskTitle,
+                FinishedSubtask(
+                    textContent = if(task.first().taskTitle.isEmpty())
+                        "Task${task.first().taskTitle} ${task.first().taskId}"
+                    else
+                        task.first().taskTitle,
 
-                        isComplete = task.first().taskComplete,
-                    )
-
-                }
+                    isComplete = task.first().taskComplete,
+                )
             }
             TextButton(
                 onClick = { deleteTask() }
@@ -113,11 +108,11 @@ fun TaskThumbnailCard(
                 Icon(
                     Icons.Default.Clear,
                     contentDescription = null,
-                    tint = surfaceSecondary
+                    tint = surfaceSecondary,
+                    modifier = modifier.size(30.dp)
                 )
             }
         }
-        Spacer(Modifier.height(4.dp))
         Surface(
             modifier
                 .padding(12.dp),
