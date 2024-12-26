@@ -1,7 +1,6 @@
 package com.example.mamduhtaskmanager.ui.home
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -29,12 +28,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mamduhtaskmanager.ViewModelProvider
-import com.example.mamduhtaskmanager.ui.component.FinishedSubtask
+import com.example.mamduhtaskmanager.ui.todo.FinishedSubtask
 import com.example.mamduhtaskmanager.ui.component.FloatingCirclesBG
-import com.example.mamduhtaskmanager.ui.component.SubTaskListItem
-import com.example.mamduhtaskmanager.ui.component.homeCircles
+import com.example.mamduhtaskmanager.ui.todo.SubTaskListItem
 import com.example.mamduhtaskmanager.ui.component.todoCircles
-import com.example.mamduhtaskmanager.ui.theme.surfacePrimary
 
 
 @Composable

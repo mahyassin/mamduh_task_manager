@@ -35,16 +35,29 @@ class TodoScreenViewModel(private val taskRepository: TaskRepository) : ViewMode
 
     }
 
+    fun removeSubtask(id: Int) {
+        val updatedSubTask = _uiState.value.task -( _uiState.value.task.find { it.subTaskId == id })
+        _uiState.update { it.copy(task = updatedSubTask as List<SubTask>) }
+    }
     fun insertTask() {
+
+        //######  updating the task title before inserting it in the database #######%$$$$$$$$$$$$$$
+
         val updatedTask = _uiState.value.task.map {
             it.copy(taskTitle = _uiState.value.taskTitle )
         }
+
         _uiState.update { it.copy(task = updatedTask) }
+
+
+        //##################  inserting in the database  ##############################
+
         viewModelScope.launch {
             _uiState.value.task.forEach {
                 taskRepository.insertSubtask(it)
             }
         }
+
     }
 
     fun onFieldTextValueChange(newText: String, id: Int) {

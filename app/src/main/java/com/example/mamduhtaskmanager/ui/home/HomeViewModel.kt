@@ -31,8 +31,6 @@ class HomeViewModel(private val taskRepository: TaskRepository) :ViewModel() {
         }
     }
 
-
-
     val tasks = taskRepository.getAll().map { it.groupBy { it.taskId }.values.toList() }
         .stateIn(
             scope = viewModelScope,

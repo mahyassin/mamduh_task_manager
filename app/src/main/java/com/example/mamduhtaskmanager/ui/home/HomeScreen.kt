@@ -33,7 +33,7 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mamduhtaskmanager.ViewModelProvider
 import com.example.mamduhtaskmanager.data.SubTask
-import com.example.mamduhtaskmanager.ui.component.TaskThumbnailCard
+import com.example.mamduhtaskmanager.ui.todo.TaskThumbnailCard
 import com.example.mamduhtaskmanager.ui.component.DefaultTopBar
 import com.example.mamduhtaskmanager.ui.component.FloatingCirclesBG
 import com.example.mamduhtaskmanager.ui.component.HomeFAB
@@ -74,7 +74,6 @@ fun HomeScreen(
                 modifier = focusModifier
             )
         },
-
 
         floatingActionButton = {
             HomeFAB() {
@@ -124,8 +123,6 @@ fun HomeScreen(
                     }
                 )
             }
-
-
         }
     }
 }

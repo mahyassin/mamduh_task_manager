@@ -22,7 +22,7 @@ object ViewModelProvider {
         }
         initializer {
             val applicatoin = (this[AndroidViewModelFactory.APPLICATION_KEY] as TaskApplicatoin)
-            HabitViewModel( applicatoin.container.taskRepository)
+            HabitViewModel( applicatoin.container.habitRepository)
         }
 
         initializer {

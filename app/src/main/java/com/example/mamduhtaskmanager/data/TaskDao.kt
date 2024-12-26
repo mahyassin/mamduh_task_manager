@@ -24,6 +24,25 @@ interface TaskDao {
 
     @Delete
     suspend fun deleteSubTask(subTask: SubTask)
+}
+
+
+@Dao
+interface HabitDao {
+    @Insert
+    suspend fun insertHabit(habit: Habit)
+
+    @Query("select * from habit")
+    fun getAllHabits(): Flow<List<Habit>>
+
+    @Query("select * from habit where id = :habitId")
+    suspend fun getHabit(habitId: Int): Habit
+
+    @Update
+    suspend fun updateHabit(habit: Habit)
+
+    @Delete
+    suspend fun deleteHabit(habit: Habit)
 
 
 }

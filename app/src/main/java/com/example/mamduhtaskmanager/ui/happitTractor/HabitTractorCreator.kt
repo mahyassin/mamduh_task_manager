@@ -71,7 +71,7 @@ enum class Goal {
 @Composable
 fun HabitContainer(
     modifier: Modifier = Modifier,
-    clock: Clock = Clock(0,0,0),
+    clock: Clock = Clock(),
     goHome: () -> Unit
 ) {
     Scaffold(
@@ -114,7 +114,7 @@ fun HabitTractorCreator(
             endingDateIspicked = { viewModel.pickEndingDate(it) },
             onDayClick = { viewModel.onWeekClick(it) },
             daysOfTheWeek = clock.daysOfTheWeek,
-            doneHabitCreation = {  }, //todo create a habbit thumbnail and a habit screen
+            doneHabitCreation = { viewModel.addHabit() },
         ) {
             h,m,s ->
             viewModel.clockChange(h,m,s)
@@ -132,8 +132,8 @@ fun HabitTractorContent(
     endingDate: Long,
     startingDateIspicked: (Long) -> Unit,
     endingDateIspicked: (Long) -> Unit,
-    onDayClick:(Pair<String, Boolean>) -> Unit,
-    daysOfTheWeek: List<Pair<String, Boolean>>,
+    onDayClick:(Pair<Int, Boolean>) -> Unit,
+    daysOfTheWeek: List<Pair<Int, Boolean>>,
     doneHabitCreation: ()-> Unit,
     clockChange: (Int, Int, Int) -> Unit,
 
@@ -286,7 +286,6 @@ fun HabitTractorContent(
                 exit = slideOutVertically() { it }
             ) {
                 Column(
-                    modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Bottom
                 ) {
                     Surface(
@@ -323,8 +322,6 @@ fun HabitTractorContent(
             HabitDoneSurface(
                 doneHabitCreation = doneHabitCreation,
                 modifier,
-
-
             )
         }
         //endregion
@@ -348,7 +345,7 @@ fun HabitDoneSurface(
     ) {
         TextButton(onClick = { doneHabitCreation() }) {
             Text(
-                "Done",
+                "Save Habit",
                 color = surfaceSecondary,
                 modifier = Modifier.padding(24.dp)
             )
@@ -488,7 +485,7 @@ fun CountTabContent(
 @Composable
 fun TimeTabContent(
     modifier: Modifier = Modifier,
-    clock: Clock? = Clock(0,0,0),
+    clock: Clock? = Clock(),
     content: String,
     showTimePicker: () -> Unit,
 
@@ -586,26 +583,6 @@ fun TimePicker(
 }
 
 @Composable
-fun TimesCounter(
-    modifier: Modifier = Modifier,
-    times: Int,
-    counterChange: (Int) -> Unit,
-    ) {
-    Surface(
-        shadowElevation = 10.dp,
-        shape = RoundedCornerShape(topEnd = 10.dp, bottomEnd = 10.dp, topStart = 0.dp, bottomStart = 0.dp)
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            CustomTimePicker(
-                0..10000,
-                times
-            ) { counterChange(times) }
-            Text("Times")
-        }
-    }
-}
-
-@Composable
 fun GoalTabBar(modifier: Modifier = Modifier) {
     Surface(
         shape = CircleShape
@@ -628,7 +605,7 @@ private fun HabitContainerPreview() {
     ) {
         IsItDark()
         HabitContainer(
-            clock = Clock(0, 0, 0),
+            clock = Clock(),
             goHome = {  }
         )
     }

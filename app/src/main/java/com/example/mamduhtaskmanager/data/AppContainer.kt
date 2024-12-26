@@ -4,6 +4,9 @@ import android.content.Context
 
 class AppContainer (private val context: Context) {
     val taskRepository: TaskRepository by lazy {
-        TaskRepository(TasksDatabase.getDatabase(context).taskDao())
+        TaskRepository(ActivityDataBase.getDatabase(context).taskDao())
+    }
+    val habitRepository: HabitRepository by lazy {
+        HabitRepository(ActivityDataBase.getDatabase(context).habitDao())
     }
 }

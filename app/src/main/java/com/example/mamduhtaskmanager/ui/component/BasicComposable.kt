@@ -72,16 +72,19 @@ import com.example.mamduhtaskmanager.ui.theme.surfacePrimary
 import com.example.mamduhtaskmanager.ui.theme.surfaceSecondary
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.text.DateFormat
+import java.text.Format
+import java.time.DayOfWeek
 import kotlin.math.abs
 
-val DaysOfTheWeek = listOf<Pair<String, Boolean>>(
-    Pair("Sat",false),
-    Pair( "Sun",false),
-    Pair( "Mon",false),
-    Pair( "Tue",false),
-    Pair( "Wen",false),
-    Pair("Thu",false),
-    Pair( "Fri",false),
+val DaysOfTheWeek = listOf<Pair<Int, Boolean>>(
+    Pair(1,true),
+    Pair( 2,false),
+    Pair( 3,false),
+    Pair( 4,false),
+    Pair( 5,false),
+    Pair(6,false),
+    Pair( 7,false),
 )
 
 @Composable
@@ -243,10 +246,10 @@ fun SelectedTab(
 @Composable
 fun DaysOfTheWeekSelector(
     modifier: Modifier = Modifier,
-    daysOfTheWeek: List<Pair<String, Boolean>>,
-    onWeekClick:(Pair<String, Boolean>) -> Unit,
+    daysOfTheWeek: List<Pair<Int, Boolean>>,
+    onWeekClick:(Pair<Int, Boolean>) -> Unit,
 
-) {
+    ) {
     Row(Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly) {
         daysOfTheWeek.forEach {
@@ -265,10 +268,18 @@ fun DaysOfTheWeekSelector(
 @Composable
 fun WeekSquare(
     modifier: Modifier = Modifier.padding(4.dp),
-    week: Pair<String, Boolean>,
-    onWeekClick:(Pair<String, Boolean>) -> Unit
+    week: Pair<Int, Boolean>,
+    onWeekClick:(Pair<Int, Boolean>) -> Unit
 ) {
-
+    val text = when(week.first) {
+        1 -> "mon"
+        2 -> "tue"
+        3 -> "wed"
+        4 -> "thu"
+        5 -> "fri"
+        6 -> "sat"
+        else -> "sun"
+    }
     Surface (
         shape = RoundedCornerShape(10),
         shadowElevation = 10.dp,
@@ -284,7 +295,7 @@ fun WeekSquare(
         color = if (week.second) surfaceSecondary else secondaryColor,
     ){
         Text(
-            week.first,
+            text,
             modifier = modifier,
             color = Color.White
         )
@@ -362,7 +373,7 @@ private fun DaysOfTheWeekSelectorPreview() {
     //viewModel Logic
     // region
     var daysOfTheWeek by remember { mutableStateOf(DaysOfTheWeek) }
-    fun onWeekClick(week: Pair<String, Boolean>) {
+    fun onWeekClick(week: Pair<Int, Boolean>) {
         val updatedDaysOfTheWeek = daysOfTheWeek.map {
             if (week.first == it.first) it.copy(second = !it.second)
             else it

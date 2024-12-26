@@ -24,5 +24,15 @@ class TaskRepository(private val tasksDao: TaskDao) {
     suspend fun deleteSubTask(subTask: SubTask) {
         return tasksDao.deleteSubTask(subTask)
     }
+}
 
+class HabitRepository (private val habitDao: HabitDao) {
+
+    suspend fun insertHabit(habit: Habit) {
+        habitDao.insertHabit(habit)
+    }
+
+    fun getAll() {
+        habitDao.getAllHabits()
+    }
 }
