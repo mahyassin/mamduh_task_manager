@@ -48,6 +48,7 @@ import com.example.mamduhtaskmanager.ui.theme.surfaceSecondary
 fun PickActivityDialog(
     modifier: Modifier = Modifier,
     onDemandRequest:  () -> Unit,
+    goTooHabit: () -> Unit,
     goToDoScreen: () -> Unit
 ) {
     val iconSizeModifier = modifier.size(50.dp)
@@ -75,10 +76,16 @@ fun PickActivityDialog(
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
-                PortriatAlertMassage(modifier = Modifier, brush, iconSizeModifier,goToDoScreen)
+                PortriatAlertMassage(
+                    modifier = Modifier, brush, iconSizeModifier, goToDoScreen,
+                    goTooHabit = { goTooHabit() }
+                )
             }
         } else {
-            LandScapeAlertMassage(modifier = Modifier, brush, iconSizeModifier,goToDoScreen)
+            LandScapeAlertMassage(
+                modifier = Modifier, brush, iconSizeModifier, goToDoScreen,
+                goToDoScreen = { goToDoScreen() }
+            )
         }
 
     }
@@ -89,6 +96,7 @@ fun LandScapeAlertMassage(
     modifier: Modifier = Modifier,
     brush: Brush,
     iconSizeModifier: Modifier,
+    goTooHabit: () -> Unit,
     goToDoScreen: () -> Unit
 ) {
     Row(
@@ -143,6 +151,7 @@ fun PortriatAlertMassage(
     brush: Brush,
     iconSizeModifier: Modifier,
     goToDoScreen: ()-> Unit,
+    goTooHabit: () -> Unit
 ) {
     Row {
         ActivityItem(Modifier.clickable{ goToDoScreen()}, brush){
@@ -174,12 +183,19 @@ fun PortriatAlertMassage(
 
 
     Row {
-        ActivityItem(Modifier, brush) {
+        ActivityItem(
+            Modifier
+                .clickable { goTooHabit() },
+            brush
+        ) {
             Icon(
                 Icons.Default.Face,
                 contentDescription = null,
                 tint = Color.White,
                 modifier = iconSizeModifier
+                    .clickable {
+                        goTooHabit()
+                    }
             )
         }
         ActivityItem(Modifier, brush) {
@@ -214,8 +230,6 @@ fun ActivityItem(modifier: Modifier = Modifier,brush: Brush, SurfaceIcon:@Compos
     )
 
 
-
-
     Surface(
         modifier
             .graphicsLayer(translationX = 0f, translationY = hovering)
@@ -234,19 +248,5 @@ fun ActivityItem(modifier: Modifier = Modifier,brush: Brush, SurfaceIcon:@Compos
             SurfaceIcon()
         }
     }
-}
-
-
-@Preview (widthDp = 1200)
-@Composable
-private fun PickActivityDialogPreview() {
-    PickActivityDialog(goToDoScreen = {}, onDemandRequest = {})
-}
-
-
-@Preview (widthDp = 600)
-@Composable
-private fun PickActivityDialogPortriatPreview() {
-    PickActivityDialog(goToDoScreen = {}, onDemandRequest = {})
 }
 

@@ -1,50 +1,39 @@
-package com.example.mamduhtaskmanager.ui.todo
+package com.example.mamduhtaskmanager.ui.todo.screens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandIn
 import androidx.compose.animation.fadeIn
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -53,8 +42,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -62,16 +49,14 @@ import com.example.mamduhtaskmanager.ViewModelProvider
 import com.example.mamduhtaskmanager.data.SubTask
 import com.example.mamduhtaskmanager.ui.component.DefaultTextField
 import com.example.mamduhtaskmanager.ui.component.DefaultTopBar
-import com.example.mamduhtaskmanager.ui.component.FloatingCircle
 import com.example.mamduhtaskmanager.ui.component.FloatingCirclesBG
-import com.example.mamduhtaskmanager.ui.component.textFieldColorGenerator
 import com.example.mamduhtaskmanager.ui.component.todoCircles
-import com.example.mamduhtaskmanager.ui.component.trackVelocity
-import com.example.mamduhtaskmanager.ui.navigation.TaskDestination
 import com.example.mamduhtaskmanager.ui.theme.primaryColor
 import com.example.mamduhtaskmanager.ui.theme.secondaryColor
 import com.example.mamduhtaskmanager.ui.theme.surfacePrimary
 import com.example.mamduhtaskmanager.ui.theme.surfaceSecondary
+import com.example.mamduhtaskmanager.ui.todo.viewModels.TodoScreenUiState
+import com.example.mamduhtaskmanager.ui.todo.viewModels.TodoScreenViewModel
 
 @Composable
 fun TodoScreen(
@@ -83,9 +68,11 @@ fun TodoScreen(
     Scaffold(
         topBar = {
             DefaultTopBar(
-                onIconClick = {},
-                title = TaskDestination.title,
-                icon = Icons.Default.ArrowBack,
+                onIconClick = {
+                    gotoHome()
+                },
+                title = "Tasks",
+                icon = Icons.AutoMirrored.Default.ArrowBack,
                 haveLeadingIcon = true
             )
         },
@@ -93,13 +80,18 @@ fun TodoScreen(
         TodoContent(
             Modifier.padding(it),
             uiState,
+
             addSubTasks = { viewModel.addSubtask() },
             onDoneClick = {
                 viewModel.insertTask()
                 gotoHome()
-            }
-        ) { newString,id ->
-            viewModel.onFieldTextValueChange(newString,id)}
+            },
+            onTextChange = { newString, id ->
+                viewModel.onFieldTextValueChange(newString, id)
+            },
+            onTitleTextChange = { viewModel.onTitleTextChange(it) },
+            deleteSubtask = { viewModel.removeSubtask(it) }
+        )
     }
 }
 
@@ -109,11 +101,13 @@ fun TodoContent(
     uiState: TodoScreenUiState,
     addSubTasks: () -> Unit,
     onDoneClick: ()-> Unit,
-    onTextChange: (String, Int) -> Unit
-) {
+    onTitleTextChange: (String) -> Unit,
+    onTextChange: (String, Int) -> Unit,
+    deleteSubtask:(Int) -> Unit,
+
+    ) {
 
     Box(modifier) {
-
         TaskScreenFloatingCircles()
         Row(horizontalArrangement = Arrangement.Center) {
             TaskAdder(
@@ -122,7 +116,10 @@ fun TodoContent(
                 onTextChange = { newString, id ->
                     onTextChange(newString, id)
                 },
-                onDoneClick = { onDoneClick() } ,
+                onDoneClick = { onDoneClick() },
+                onTitleTextChange = { onTitleTextChange(it) },
+                taskTitle = uiState.taskTitle,
+                deleteSubtask = { deleteSubtask(it) },
             )
         }
 
@@ -134,9 +131,12 @@ fun TodoContent(
 fun TaskAdder(
     modifier: Modifier = Modifier,
     task: List<SubTask>,
+    taskTitle: String,
     addSubTasks: ()-> Unit,
     onDoneClick: ()-> Unit,
+    onTitleTextChange: (String) -> Unit,
     onTextChange: (String, Int) -> Unit,
+    deleteSubtask:(Int) -> Unit,
     ) {
     val brush = Brush.linearGradient(
         listOf(
@@ -191,16 +191,18 @@ fun TaskAdder(
                 }
             }
             DefaultTextField(
-                value = "",
-                onValueChange = {},
+                value = taskTitle,
+                onValueChange = { onTitleTextChange(it) },
                 shape = RectangleShape,
                 label = "Task title  'optional' ",
                 borderColor = brush
             )
             SubTasksList(
-               task = task,
-               onTextChange = { newString,id ->
-                   onTextChange(newString,id)}
+                task = task,
+                onTextChange = { newString, id ->
+                    onTextChange(newString, id)
+                },
+                deleteSubtask = { deleteSubtask(it) }
             )
 
         }
@@ -212,6 +214,8 @@ fun SubTasksList(
     modifier: Modifier = Modifier,
     task: List<SubTask>,
     onTextChange: (String, Int) -> Unit,
+    deleteSubtask:(Int) -> Unit,
+
 ) {
     LazyColumn(
         Modifier.padding(12.dp),
@@ -222,7 +226,8 @@ fun SubTasksList(
                 subTask = subTask,
                 onTextChange = { newString, id ->
                     onTextChange(newString, id)
-                }
+                },
+                deleteSubtask = { deleteSubtask(it) }
             )
         }
     }
@@ -232,7 +237,9 @@ fun SubTasksList(
 fun SubTaskItem(
     modifier: Modifier = Modifier,
     subTask: SubTask,
-    onTextChange:(String, Int) -> Unit
+    onTextChange:(String, Int) -> Unit,
+    deleteSubtask:(Int) -> Unit,
+
 ) {
 
     val brush = Brush.linearGradient(
@@ -267,11 +274,21 @@ fun SubTaskItem(
             TextField(
                 value = subTask.content,
                 onValueChange = { onTextChange(it,subTask.subTaskId) },
-                modifier = modifier.padding(horizontal = 24.dp),
-                label = { Text("task ${subTask.id + 1}") },
-                colors = textFieldColorGenerator(0)
+                modifier = modifier,
+                label = { Text("task ${subTask.subTaskId + 1}") },
+                colors = textFieldColorGenerator(0),
             )
+
+            IconButton(onClick = { deleteSubtask(subTask.subTaskId) }) {
+                Icon(
+                    Icons.Default.Clear,
+                    contentDescription = null,
+                    modifier.padding(8.dp),
+                    tint = surfaceSecondary
+                )
+            }
         }
+
     }
 }
 
@@ -281,14 +298,34 @@ fun TaskScreenFloatingCircles(modifier: Modifier = Modifier) {
     FloatingCirclesBG(modifier, todoCircles)
 }
 
+@Preview (showBackground = true)
+@Composable
+private fun SubTaskItemPreview() {
+    SubTaskItem(
+        subTask = SubTask(
+            id = 0,
+            subTaskId = 0,
+            done = false,
+            content = "this is experimental",
+            taskId = 0,
+            taskTitle = "",
+            taskComplete = false
+        ),
+        onTextChange =  { text,id -> },
+        deleteSubtask = { TODO() },
+    )
+}
+
 @Preview
 @Composable
 private fun TodoScreeenPreview() {
     TodoContent(
         uiState = TodoScreenUiState(),
-        addSubTasks = {  },
-        onDoneClick = {  },
-        onTextChange = { newString, id -> }
+        addSubTasks = { },
+        onDoneClick = { },
+        onTextChange = { newString, id -> },
+        onTitleTextChange = {},
+        deleteSubtask = {  }
     )
 }
 

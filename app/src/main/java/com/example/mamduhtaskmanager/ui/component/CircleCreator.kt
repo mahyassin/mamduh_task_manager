@@ -17,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.mamduhtaskmanager.ui.theme.primaryColor
 import com.example.mamduhtaskmanager.ui.theme.secondaryColor
@@ -32,22 +33,34 @@ fun FloatingCirclesBG(modifier: Modifier = Modifier, circles: List<FloatingCircl
         var targertRadius1 by remember { mutableStateOf(0f) }
         val radius1 = createCircleAnimation(targertRadius1,it.spawnTime)
 
+        val infiniteTransition = rememberInfiniteTransition(label = "hovering animatoin ")
+        val yDisplacment by  infiniteTransition.animateFloat(
+            0f,
+            targetValue = it.hoveringDistance,
+            animationSpec = infiniteRepeatable(
+                animation = keyframes {
+                    durationMillis = (4000..5000).random()
+                },
+                repeatMode = RepeatMode.Reverse,
 
-        val hoveringy = ciricleHovering(it.hoveringDistance)
-        LaunchedEffect(Unit) {
+                ),
+            "hovering impl"
+        )
+
+        LaunchedEffect(true) {
 
             delay(100)
             targertRadius1 = it.radius
 
         }
 
-        Canvas(modifier.fillMaxSize()) {
+        Canvas(modifier.fillMaxSize().graphicsLayer { translationY = yDisplacment }) {
             drawCircle(
                 it.brush,
                 radius1,
                 center = Offset(
                     it.offestx,
-                    it.offesty + hoveringy
+                    it.offesty
                 )
             )
 
@@ -56,25 +69,6 @@ fun FloatingCirclesBG(modifier: Modifier = Modifier, circles: List<FloatingCircl
     }
 }
 
-@Composable
-fun ciricleHovering(hoveringDistance: Float): Float {
-
-    val infiniteTransition = rememberInfiniteTransition(label = "hovering animatoin ")
-    val yDisplacment =  infiniteTransition.animateFloat(
-        0f,
-        targetValue = hoveringDistance,
-        animationSpec = infiniteRepeatable(
-            animation = keyframes {
-                durationMillis = (4000..5000).random()
-            },
-            repeatMode = RepeatMode.Reverse,
-
-            ),
-        "hovering impl"
-    )
-    return yDisplacment.value
-
-}
 
 @Composable
 fun createCircleAnimation(targetRadius2: Float, delay: Int): Float {
@@ -117,16 +111,17 @@ private fun HomeBackGroundPreview() {
     FloatingCirclesBG(modifier = Modifier,circles)
 }
 
-val secoundrayBrush = Brush.linearGradient(
-    listOf(
-        surfacePrimary,
-        surfaceSecondary
-    )
-)
+
 val primaryBrush = Brush.linearGradient(
     listOf(
         primaryColor,
         secondaryColor
+    )
+)
+val secoundryBrush = Brush.linearGradient(
+    listOf(
+        surfacePrimary,
+        surfaceSecondary
     )
 )
 
@@ -210,4 +205,5 @@ val habitCircles = listOf(
         20f,
         500
     ),
+
 )
