@@ -6,11 +6,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.example.mamduhtaskmanager.ui.happitTractor.HabitContainer
-import com.example.mamduhtaskmanager.ui.happitTractor.HabitTractorCreator
-import com.example.mamduhtaskmanager.ui.home.ActivityDetail
+import com.example.mamduhtaskmanager.ui.habitContent.screens.HabitContainer
+import com.example.mamduhtaskmanager.ui.habitContent.screens.HabitDetailsContainer
+import com.example.mamduhtaskmanager.ui.todo.screens.ActivityDetail
 import com.example.mamduhtaskmanager.ui.home.HomeScreen
-import com.example.mamduhtaskmanager.ui.todo.TodoScreen
+import com.example.mamduhtaskmanager.ui.todo.screens.TodoScreen
 
 
 @Composable
@@ -22,16 +22,12 @@ fun HomeScreenContainer(modifier: Modifier = Modifier) {
     ){
         composable<Home>{
             HomeScreen(
-                goToActivity = {
-                    navHostController.navigate(ActivityDetailsRoute(it))
+                goToDetails = {
+                    navHostController.navigate(it)
                 },
 
-                goToDoScreen = {
-                    navHostController.navigate(TaskDestination)
-                },
-
-                goToHabit = {
-                    navHostController.navigate(Habit)
+                goToActivityCreation = { destination ->
+                    navHostController.navigate(destination)
                 },
             )
         }
@@ -48,10 +44,17 @@ fun HomeScreenContainer(modifier: Modifier = Modifier) {
             TodoScreen { navHostController.popBackStack(Home,false) }
         }
 
-        composable<Habit> {
+        composable<HabitDestination> {
             HabitContainer() {
                 navHostController.popBackStack(Home,false)
             }
+        }
+
+        composable<HabitDetailsRoute> {
+            val argument = it.toRoute<HabitDetailsRoute>()
+            HabitDetailsContainer(
+                habitId = argument.habitId
+            )
         }
     }
 

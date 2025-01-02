@@ -1,4 +1,4 @@
-package com.example.mamduhtaskmanager.ui.home
+package com.example.mamduhtaskmanager.ui.todo.screens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -28,10 +28,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mamduhtaskmanager.ViewModelProvider
-import com.example.mamduhtaskmanager.ui.todo.FinishedSubtask
 import com.example.mamduhtaskmanager.ui.component.FloatingCirclesBG
-import com.example.mamduhtaskmanager.ui.todo.SubTaskListItem
 import com.example.mamduhtaskmanager.ui.component.todoCircles
+import com.example.mamduhtaskmanager.ui.todo.viewModels.ActivityDetailsViewModel
 
 
 @Composable
@@ -62,7 +61,7 @@ fun ActivityDetail(
                 shape = CircleShape
             ) {
                 FinishedSubtask(
-                    textContent = if(task.first().taskTitle.isEmpty())
+                    textContent = if (task.first().taskTitle.isEmpty())
                         "Task${task.first().taskTitle} ${task.first().taskId}"
                     else
                         task.first().taskTitle,

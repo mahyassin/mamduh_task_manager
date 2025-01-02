@@ -42,6 +42,7 @@ import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -119,7 +120,7 @@ fun MyDrawer(modifier: Modifier = Modifier) {
                 }
 
                 item() {
-                    Divider(
+                    HorizontalDivider(
                         Modifier
                             .width(300.dp)
                             .padding(vertical = 12.dp))
@@ -156,7 +157,7 @@ fun MyDrawer(modifier: Modifier = Modifier) {
 
                 }
                 item() {
-                    Divider(
+                    HorizontalDivider(
                         Modifier
                             .width(300.dp)
                             .padding(vertical = 12.dp))
@@ -233,7 +234,10 @@ fun DefaultTopBar(
     icon: ImageVector = Icons.Default.Menu,
     modifier: Modifier = Modifier,
     title: String = "Home",
-    haveLeadingIcon: Boolean = false
+    haveLeadingIcon: Boolean = false,
+    isMenuIcon: Boolean = false,
+    showMenu: () -> Unit = {},
+
 ) {
     val infiniteTransition = rememberInfiniteTransition("backGround Transitoin")
     val bgColor =infiniteTransition.animateColor(
@@ -261,7 +265,8 @@ fun DefaultTopBar(
                 modifier
                     .fillMaxWidth()
                     .drawBehind { drawRect(color = bgColor.value) },
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 if (haveLeadingIcon){
                     Icon(
@@ -280,6 +285,18 @@ fun DefaultTopBar(
                     title, style = MaterialTheme.typography.headlineMedium,
                     color = Color.White,
                     modifier = modifier.padding(12.dp)
+                )
+                if (isMenuIcon)
+                Icon(
+                    Icons.Default.Menu,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = modifier
+                        .size(60.dp)
+                        .padding(12.dp)
+                        .clickable{
+                        showMenu()
+                    }
                 )
 
             }

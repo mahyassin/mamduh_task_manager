@@ -10,12 +10,13 @@ import java.time.LocalTime
 data class SubTask(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val subTaskId: Int,
+    val subTaskId: Int = 0,
     var done: Boolean = false,
     var content: String = "",
 
     val taskId: Int = 0,
     val taskTitle: String = "",
+
     val taskComplete: Boolean = false,
 
     )
@@ -30,10 +31,23 @@ data class Habit(
     val timer: Int = 10,
     val onTask: Boolean = false,
     val title: String = "drinking water",
-    val habitDays: List<DayOfWeek>,
-    val todaysWork: DayOfWeek = DayOfWeek.of(LocalDateTime.now().dayOfWeek.value -1),
+    val habitDays: List<DayOfWeek> = listOf(DayOfWeek.MONDAY),
+    val today: Int? = null,
+    val progress: Int = 0,
+    val dailyProgress: Float = 0f,
     val type: Int = 0 // 0 for task 1 for timer 2 for count
-)
+) {
+    fun checkToday(resetProgress: () -> Unit) {
+        if (today == LocalDateTime.now().dayOfWeek.value) {
+            return
+        }
+        val workDay = habitDays.find { it == LocalDateTime.now().dayOfWeek } != null
+        if (workDay) {
+            resetProgress()
+        }
+    }
+
+}
 //for later to decide
 
 val experimentalTask = listOf(

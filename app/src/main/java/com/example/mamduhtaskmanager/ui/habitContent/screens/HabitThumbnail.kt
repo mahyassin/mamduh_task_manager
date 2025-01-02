@@ -1,11 +1,14 @@
-package com.example.mamduhtaskmanager.ui.happitTractor
+package com.example.mamduhtaskmanager.ui.habitContent.screens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -17,78 +20,88 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.mamduhtaskmanager.ViewModelProvider
 import com.example.mamduhtaskmanager.data.Habit
-import com.example.mamduhtaskmanager.ui.component.DaysOfTheWeek
+import com.example.mamduhtaskmanager.ui.habitContent.viewModels.HabitThumbNailViewModel
+import com.example.mamduhtaskmanager.ui.habitContent.viewModels.TimerUiState
 import com.example.mamduhtaskmanager.ui.theme.slitedBoxShape
-import java.text.DateFormat
-import java.time.DayOfWeek
+import com.example.mamduhtaskmanager.ui.todo.screens.DelteIcon
 import kotlin.Boolean
 
 @Composable
-fun TempContainer(
+fun HabitThumbnailContainer(
     modifier: Modifier = Modifier,
-    viewModel: HabitThumbNailViewModel = viewModel()
+    deleteHabit: () -> Unit,
+    habit: Habit,
+    goToHabitDetails: () -> Unit
 ) {
-    val timer by viewModel.displayClock.collectAsState()
-    val habit by viewModel.habit.collectAsState()
+    val viewModel: HabitThumbNailViewModel = viewModel(factory = ViewModelProvider.Factory)
 
+    LaunchedEffect(true) {
+        viewModel.habitPicker(habit.id)
+    }
+    val habitList by viewModel.habits.collectAsState()
+    val timer by viewModel.timerUiState.collectAsState()
+    val id = habit.id
 
     HabitThumbnail(
-        onCheckedChange = { viewModel.onTaskDone(it) },
         timer = timer,
-        onPlayClicked = { viewModel.onPlayClick() },
-        pause = { viewModel.pause() },
-        countDown = { viewModel.countDown() },
-        habit = habit,
-        reset = { viewModel.resetProgress() }
-    )
+        habit = habitList.find { it.id == id } ?: Habit(title = "notFound"),
+        delete = { deleteHabit() },
+        goToHabitDetails = { goToHabitDetails() }
+    ) {
+        viewModel.event(it,id)
+    }
 }
 @Composable
 fun HabitThumbnail(
     modifier: Modifier = Modifier,
-    onCheckedChange: (Boolean) -> Unit,
-    onPlayClicked: () -> Unit,
-    pause: () -> Unit,
-    countDown:() -> Unit,
-    timer: HabitThumbnailState,
-    reset:()-> Unit,
-    habit: Habit
+    timer: TimerUiState,
+    habit: Habit,
+    delete: ()-> Unit,
+    goToHabitDetails: () -> Unit,
+    eventListener: (String) -> Unit,
 ) {
-    Column {
+    Column(
+        modifier.padding(16.dp). clickable { goToHabitDetails() },
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+       TitleStrip(title = habit.title) { delete() }
         when(habit.type) {
             0 ->  TaskHabit(
                 taskDone = habit.done,
-                onCheckedChange = { onCheckedChange(it) }
+                onCheckedChange = { eventListener(HabitEvent.ON_TASK_DONE) },
             )
             1 -> {
                 TimeHabit(
                     timerUiState = timer,
                     onTask = habit.onTask,
-                    onPlayClicked = { onPlayClicked() },
-                    pause = { pause() },
-                    habitTitle = habit.title,
+                    onPlayClicked = { eventListener(HabitEvent.PLAY) },
+                    pause = { eventListener(HabitEvent.PAUSE) },
                     done = habit.done
                 )
 
             }
             else -> {
                 CountHabit(
-                    habitTitle = habit.title,
-                    count = timer.count,
-                    countDown = { countDown() },
-                    done = habit.done
+                    done = habit.done,
+                    count = habit.count - habit.progress,
+                    countDown = { eventListener(HabitEvent.ON_COUNT_DOWN) },
                 )
             }
         }
-
-       ResetButton { reset() }
     }
 }
 
@@ -105,58 +118,91 @@ fun ResetButton(
 
 }
 
+
+@Composable
+fun TaskHabit(
+    modifier: Modifier = Modifier,
+    taskDone: Boolean,
+    onCheckedChange: () -> Unit,
+) {
+    Surface(
+        modifier.height( 50.dp),
+        shape = slitedBoxShape,
+        shadowElevation = 10.dp,
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier
+                .padding(8.dp)
+                .width(150.dp)
+        ) {
+            Text("Complete")
+            Checkbox(
+                checked = taskDone,
+                onCheckedChange = { onCheckedChange() }
+            )
+
+        }
+    }
+}
+
 @Composable
 fun CountHabit(
     modifier: Modifier = Modifier,
-    habitTitle: String,
-    count: Int,
     done: Boolean,
-    countDown:() -> Unit,
+    count: Int,
+    countDown: () -> Unit,
+   
     ) {
     Surface(
         shape = slitedBoxShape,
-        shadowElevation = 10.dp
+        shadowElevation = 10.dp,
+        modifier = modifier.width(150.dp)
     ) {
         if (!done)
         Row(
             modifier.padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
             ) {
-            Text("$habitTitle : $count Times",)
 
+            Text("do the task")
             Icon(
                 Icons.Default.Check,
                 contentDescription = null,
-                modifier = modifier.clickable {
-                    countDown()
-                }
+                modifier = modifier
+                    .clickable {
+                        countDown()
+                    }
+                    .padding(horizontal = 4.dp)
             )
+            Text("$count")
         }
-        else Text("${habitTitle} is done", modifier.padding(4.dp))
+        else DoneMassege("task")
+
     }
 }
+
 
 @Composable
 fun TimeHabit(
     modifier: Modifier = Modifier,
-    timerUiState: HabitThumbnailState,
+    timerUiState: TimerUiState,
     onTask: Boolean,
     pause: () -> Unit,
-    habitTitle: String,
     done: Boolean,
     onPlayClicked: () -> Unit,
 ) {
 
     Column {
         Surface(
-            modifier,
+            modifier.width(150.dp),
             shape = slitedBoxShape,
             shadowElevation = 10.dp,
         ) {
-            if (done) DoneMassege(habitTitle)
+            if (done) DoneMassege("task")
 
             else HabitInProgressRow(
-                habitTitle = habitTitle,
                 onTask = onTask,
                 onPlayClicked = onPlayClicked,
                 timerUiState = timerUiState,
@@ -168,23 +214,18 @@ fun TimeHabit(
 
 @Composable
 fun HabitInProgressRow(
-    modifier: Modifier = Modifier,
-    habitTitle: String,
     onTask: Boolean,
     onPlayClicked:() -> Unit,
-    timerUiState: HabitThumbnailState,
+    timerUiState: TimerUiState,
     pause: () -> Unit
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            "$habitTitle ",
-            modifier.padding(horizontal = 4.dp)
-        )
         if (!onTask) {
-           PlayButton() { onPlayClicked() }
+            Text("Start")
+            PlayButton() { onPlayClicked() }
         } else {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 DisplayClock(timerUiState = timerUiState)
@@ -212,7 +253,7 @@ fun PauseButton(
 @Composable
 fun DisplayClock(
     modifier: Modifier = Modifier,
-    timerUiState: HabitThumbnailState,
+    timerUiState: TimerUiState,
 ) {
     Text(
         timerUiState.displayHour.toString().padStart(2, '0') +
@@ -247,61 +288,63 @@ fun DoneMassege(
     Text("$habitTitle is done", modifier.padding(4.dp))
 }
 
-@Composable
-fun TaskHabit(
-    modifier: Modifier = Modifier,
-    taskDone: Boolean,
-    onCheckedChange: (Boolean) -> Unit
-) {
-    Surface(
-        modifier.size(width = 100.dp, height =  50.dp),
-        shape = slitedBoxShape,
-        shadowElevation = 10.dp,
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                "Habit Title ",
-                modifier.padding(horizontal = 4.dp)
-            )
-            Checkbox(
-                checked = taskDone,
-                onCheckedChange = { onCheckedChange(it) }
-            )
 
-        }
+@Composable
+fun ThumbnailTitle(title: String) {
+    Row(
+        Modifier.padding(horizontal = 4.dp)
+    ) {
+        Text(
+            text = title,
+            maxLines = 1,
+            modifier = Modifier
+                .widthIn(max = 140.dp)
+                .padding(4.dp)
+
+        )
+        if (title.length > 16)
+            Text(
+                text = "...",
+            )
     }
 }
 
+@Composable
+fun TitleStrip(
+    modifier: Modifier = Modifier,
+    title: String,
+    delete: () -> Unit,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.padding(bottom = 8.dp)
+    ) {
+        Surface(
+            shadowElevation = 10.dp,
+            shape = CircleShape,
+            modifier = modifier
+                .padding(4.dp)
+                .widthIn(max = 125.dp)
+        ) {
+            ThumbnailTitle(title)
+        }
+        DelteIcon { delete()  }
+    }
+}
 @Preview
 @Composable
-private fun TimeHabitPreview() {
-    DisplayClock(
-        timerUiState = HabitThumbnailState(
-            displayHour = 2,
-            displayMinute = 34,
-            displaySecound = 11
-        )
-    )
+private fun OnWorkingPreview() {
+    TitleStrip(title = "reading a book ") {}
 }
 @Preview(showBackground = true,)
 @Composable
 private fun HabitThumbnailPreview() {
-    TempContainer()
+    var habit by remember { mutableStateOf(Habit()) }
+
 }
 
 @Preview
 @Composable
 private fun TodayPreview() {
-    val habitDays = DaysOfTheWeek.mapNotNull {
-        if (it.second) {
-            DayOfWeek.of(it.first)
-        } else{
-            null
-        }
-    }
 
-    Text("${habitDays}")
 }

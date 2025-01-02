@@ -1,4 +1,4 @@
-package com.example.mamduhtaskmanager.ui.happitTractor
+package com.example.mamduhtaskmanager.ui.habitContent.screens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
@@ -17,7 +16,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -51,6 +49,8 @@ import com.example.mamduhtaskmanager.ui.component.FloatingCirclesBG
 import com.example.mamduhtaskmanager.ui.component.GoalTabRow
 import com.example.mamduhtaskmanager.ui.component.habitCircles
 import com.example.mamduhtaskmanager.ui.component.secoundryBrush
+import com.example.mamduhtaskmanager.ui.habitContent.viewModels.Clock
+import com.example.mamduhtaskmanager.ui.habitContent.viewModels.HabitViewModel
 import com.example.mamduhtaskmanager.ui.navigation.HabitTractorDestination
 import com.example.mamduhtaskmanager.ui.theme.IsItDark
 import com.example.mamduhtaskmanager.ui.theme.MamduhTaskManagerTheme
@@ -86,7 +86,10 @@ fun HabitContainer(
     ) {
         Box {
             LookaheadScope {
-                HabitTractorCreator(modifier.padding(it),)
+                HabitTractorCreator(
+                    modifier.padding(it),
+                    goHome = { goHome() },
+                )
             }
 
         }
@@ -98,27 +101,36 @@ fun HabitContainer(
 fun HabitTractorCreator(
     modifier: Modifier = Modifier,
     viewModel: HabitViewModel = viewModel(factory = ViewModelProvider.Factory),
+    goHome: () -> Unit
 
 ) {
     val clock by viewModel.clock.collectAsState()
+    val habitUi by viewModel.habitUi.collectAsState()
 
 
     Box(modifier) {
         FloatingCirclesBG(modifier = Modifier,habitCircles)
         HabitTractorContent(
-            clock = clock, times = clock.times,
-            counterChange = { viewModel.counterChange(it) },
+            clock = clock,
+            times = habitUi.count,
+            counterChange = { viewModel.textFieldUpdater(it, "count") },
             startigDate = clock.startingDate,
             endingDate = clock.endingDate,
             startingDateIspicked = { viewModel.pickStartingDate(it) },
             endingDateIspicked = { viewModel.pickEndingDate(it) },
             onDayClick = { viewModel.onWeekClick(it) },
             daysOfTheWeek = clock.daysOfTheWeek,
-            doneHabitCreation = { viewModel.addHabit() },
-        ) {
-            h,m,s ->
-            viewModel.clockChange(h,m,s)
-        }
+            doneHabitCreation = {
+                viewModel.addHabit()
+                goHome()
+            },
+            clockChange = { h, m, s ->
+                viewModel.clockChange(h, m, s)
+            },
+            habitTitle = habitUi.title,
+            onHabitTitleChange = { viewModel.textFieldUpdater(it, "habit_title") },
+            onGoalChange = { viewModel.habitTypeUpdate(it) },
+        )
     }
 }
 
@@ -136,6 +148,9 @@ fun HabitTractorContent(
     daysOfTheWeek: List<Pair<Int, Boolean>>,
     doneHabitCreation: ()-> Unit,
     clockChange: (Int, Int, Int) -> Unit,
+    onGoalChange: (Goal) -> Unit,
+    habitTitle: String,
+    onHabitTitleChange: (String) -> Unit
 
     ) {
     Box {
@@ -158,8 +173,8 @@ fun HabitTractorContent(
                         )
                 )
                 DefaultTextField(
-                    value = "",
-                    onValueChange = { },
+                    value = habitTitle,
+                    onValueChange = { onHabitTitleChange(it) },
                     shape = CircleShape,
                     label = "Habit Name",
                     borderColor = brush,
@@ -175,7 +190,11 @@ fun HabitTractorContent(
             // region
             GoalTabRow(
                 selected = selectedTab,
-                selecteMe = { selectedTab = it }
+                selecteMe = {
+                    selectedTab = it
+                    onGoalChange(it)
+
+                }
             ) //endregion
 
 
@@ -489,7 +508,7 @@ fun TimeTabContent(
     content: String,
     showTimePicker: () -> Unit,
 
-) {
+    ) {
 
     val text: String = if (clock == null) {
         content

@@ -1,11 +1,5 @@
 package com.example.mamduhtaskmanager.ui.component
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.EaseInBounce
-import androidx.compose.animation.core.EaseInCubic
-import androidx.compose.animation.core.EaseInOutBounce
-import androidx.compose.animation.core.EaseOutBounce
-import androidx.compose.animation.core.EaseOutSine
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
@@ -13,9 +7,6 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -23,21 +14,21 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -56,25 +47,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.mamduhtaskmanager.ui.happitTractor.Goal
+import androidx.compose.ui.window.Dialog
+import com.example.mamduhtaskmanager.ui.habitContent.screens.Goal
 import com.example.mamduhtaskmanager.ui.theme.primaryColor
 import com.example.mamduhtaskmanager.ui.theme.secondaryColor
 import com.example.mamduhtaskmanager.ui.theme.surfacePrimary
 import com.example.mamduhtaskmanager.ui.theme.surfaceSecondary
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.text.DateFormat
-import java.text.Format
-import java.time.DayOfWeek
 import kotlin.math.abs
 
 val DaysOfTheWeek = listOf<Pair<Int, Boolean>>(
@@ -113,7 +102,9 @@ fun DefaultTextField(
             unfocusedIndicatorColor = Color(0x00ffffff)
         ),
         label = {Text(label)},
-        modifier = modifier.border(2.dp, borderColor,shape)
+        modifier = modifier.border(2.dp, borderColor,shape),
+        keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+
     )
 }
 
@@ -363,8 +354,45 @@ fun CustomTimePicker(
                 .border(width = 2.dp, brush = secoundryBrush, shape = RoundedCornerShape(10))
         )
     }
+}
 
-   
+@Composable
+fun AreYouSureMessage(
+    modifier: Modifier = Modifier,
+    message: String,
+    dissmiss: () -> Unit,
+    delete: () -> Unit,
+
+) {
+    Dialog(
+        onDismissRequest = { dissmiss() }
+    ) {
+        Surface(
+            shape = RoundedCornerShape(20)
+        ) {
+            Column(modifier.padding(16.dp)) {
+                Text(message,modifier.padding(24.dp))
+
+                Row(
+                    modifier.width(350.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Button(
+                        onClick = {
+                            delete()
+                            dissmiss()
+                        }
+                    ) { Text("Yes") }
+
+
+                    OutlinedButton(
+                        onClick = { dissmiss() }
+                    ) { Text("No") }
+                }
+            }
+        }
+    }
+
 }
 
 @Preview (widthDp = 380)

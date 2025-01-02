@@ -1,9 +1,7 @@
-package com.example.mamduhtaskmanager.ui.todo
+package com.example.mamduhtaskmanager.ui.todo.viewModels
 
-import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mamduhtaskmanager.data.SubTask
 import com.example.mamduhtaskmanager.data.TaskRepository
 import com.example.mamduhtaskmanager.data.TempValHolder
@@ -36,8 +34,8 @@ class TodoScreenViewModel(private val taskRepository: TaskRepository) : ViewMode
     }
 
     fun removeSubtask(id: Int) {
-        val updatedSubTask = _uiState.value.task -( _uiState.value.task.find { it.subTaskId == id })
-        _uiState.update { it.copy(task = updatedSubTask as List<SubTask>) }
+        val updatedSubTask = _uiState.value.task -( _uiState.value.task.find { it.subTaskId == id }?: SubTask())
+        _uiState.update { it.copy(task = updatedSubTask) }
     }
     fun insertTask() {
 

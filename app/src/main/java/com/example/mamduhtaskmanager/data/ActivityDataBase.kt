@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-@Database(entities = [SubTask::class, Habit::class], version = 1,)
+@Database(entities = [SubTask::class, Habit::class], version = 2,)
 @TypeConverters(/* ...value = */ TypeConverter::class) // Apply the TypeConverters class
 abstract class ActivityDataBase: RoomDatabase(){
     abstract fun taskDao(): TaskDao

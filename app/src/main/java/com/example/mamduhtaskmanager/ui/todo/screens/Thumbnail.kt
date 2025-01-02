@@ -1,4 +1,4 @@
-package com.example.mamduhtaskmanager.ui.todo
+package com.example.mamduhtaskmanager.ui.todo.screens
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.EaseOut
@@ -29,7 +29,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -58,7 +57,6 @@ import com.example.mamduhtaskmanager.ui.theme.surfaceSecondary
 @Composable
 fun TaskThumbnailCard(
     modifier: Modifier = Modifier,
-    title: String = "",
     task: List<SubTask>,
     showDetails: () -> Unit,
     deleteTask: () -> Unit,
@@ -101,17 +99,7 @@ fun TaskThumbnailCard(
                     isComplete = task.first().taskComplete,
                 )
             }
-            TextButton(
-                onClick = { deleteTask() }
-
-            ){
-                Icon(
-                    Icons.Default.Clear,
-                    contentDescription = null,
-                    tint = surfaceSecondary,
-                    modifier = modifier.size(30.dp)
-                )
-            }
+           DelteIcon { deleteTask() }
         }
         Surface(
             modifier
@@ -136,6 +124,18 @@ fun TaskThumbnailCard(
         }
         DoneCounter(task = task)
     }
+}
+
+@Composable
+fun DelteIcon(deleteTask: () -> Unit) {
+    Icon(
+        Icons.Default.Clear,
+        contentDescription = null,
+        tint = surfaceSecondary,
+        modifier = Modifier.size(15.dp).clickable {
+            deleteTask()
+        }
+    )
 }
 
 @Composable
@@ -377,31 +377,6 @@ fun textFieldColorGenerator(type: Int): TextFieldColors {
     return outPut
 }
 
-
-@Preview( showBackground = true)
-@Composable
-private fun AcitivityCardPreview() {
-    TaskThumbnailCard(
-        title = "",
-        task = experimentalTask,
-        showDetails = { },
-        modifier = Modifier,
-        deleteTask = {  }
-    )
-}
-
-@Preview
-@Composable
-private fun ThumbnalsPreview() {
-
-    TaskThumbnailCard(
-        title = "",
-        task = experimentalTask,
-        showDetails = {},
-        modifier = Modifier,
-        deleteTask = {  }
-    )
-}
 
 @Preview
 @Composable

@@ -32,7 +32,19 @@ class HabitRepository (private val habitDao: HabitDao) {
         habitDao.insertHabit(habit)
     }
 
-    fun getAll() {
-        habitDao.getAllHabits()
+    fun getAll(): Flow<List<Habit>> {
+        return habitDao.getAllHabits()
+    }
+
+    suspend fun deleteHabit(habit: Habit) {
+        return habitDao.deleteHabit(habit)
+    }
+
+    suspend fun update(habit: Habit) {
+        return habitDao.updateHabit(habit)
+    }
+
+    suspend fun getHabit(id: Int): Habit {
+        return habitDao.getHabit(id)
     }
 }

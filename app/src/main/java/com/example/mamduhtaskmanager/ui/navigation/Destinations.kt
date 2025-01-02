@@ -5,6 +5,7 @@ import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.example.mamduhtaskmanager.data.Habit
 import kotlinx.serialization.Serializable
 
 interface Destinations {
@@ -13,7 +14,7 @@ interface Destinations {
 }
 
 @Serializable
-object Habit
+object HabitDestination
 
 @Serializable
 object Home: Destinations {
@@ -45,3 +46,7 @@ object HabitTractorDestination: Destinations {
         get() = Icons.Default.Face
 
 }
+@Serializable
+data class HabitDetailsRoute (
+    val habitId: Int
+)

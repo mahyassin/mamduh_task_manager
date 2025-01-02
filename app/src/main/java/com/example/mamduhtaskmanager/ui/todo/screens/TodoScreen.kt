@@ -1,4 +1,4 @@
-package com.example.mamduhtaskmanager.ui.todo
+package com.example.mamduhtaskmanager.ui.todo.screens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -17,8 +17,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -55,6 +55,8 @@ import com.example.mamduhtaskmanager.ui.theme.primaryColor
 import com.example.mamduhtaskmanager.ui.theme.secondaryColor
 import com.example.mamduhtaskmanager.ui.theme.surfacePrimary
 import com.example.mamduhtaskmanager.ui.theme.surfaceSecondary
+import com.example.mamduhtaskmanager.ui.todo.viewModels.TodoScreenUiState
+import com.example.mamduhtaskmanager.ui.todo.viewModels.TodoScreenViewModel
 
 @Composable
 fun TodoScreen(
@@ -70,7 +72,7 @@ fun TodoScreen(
                     gotoHome()
                 },
                 title = "Tasks",
-                icon = Icons.Default.ArrowBack,
+                icon = Icons.AutoMirrored.Default.ArrowBack,
                 haveLeadingIcon = true
             )
         },
@@ -102,8 +104,8 @@ fun TodoContent(
     onTitleTextChange: (String) -> Unit,
     onTextChange: (String, Int) -> Unit,
     deleteSubtask:(Int) -> Unit,
-    
-) {
+
+    ) {
 
     Box(modifier) {
         TaskScreenFloatingCircles()
